@@ -14,43 +14,52 @@ menu = "main"
 weight = 1
 +++
 
-Cross-site search (XS-Search) is an important attack principle in the family of XS-Leaks. This type of attack abuses Query-Based Search Systems to leak user information from an attacker origin [^1] [^2]. The original attack uses timing measurements to detect whether or not a search system returns results and works as follows:
+XS-Search（クロスサイトサーチ）は、XS-Leaksのファミリーの中で重要な攻撃原理である。
+この種の攻撃は、クエリベースの検索システムを悪用し、攻撃者のオリジンからユーザ情報をリークする[^1] [^2]。
 
-1. Establish a baseline of the time needed for a request to return results (hit), and a baseline for the time needed by a request with no results (miss).
-2. Start a [timing attack]({{< ref "./timing-attacks/network-timing.md" >}}) on the request to the search endpoint, brute-forcing the first character (`?q=r`).
-3. If the measurement is under the hit baseline, then add one more character (`?q=ra`); otherwise try a new one (`?q=s`).
-4. In the end, a full secret (`?q=secret`) can be leaked.
-
-This attack requires multiple timing measurements to be accurate, something which can be improved with inflation techniques and statistical analysis. Furthermore, instead of brute-forcing letter by letter, attackers can search specific words or sentences to leak only the occurrence of results.
-
-The most important part of this attack is its principle, as it can be applied to a number of different XS-Leaks.
-
-## Inflation Techniques
-
-The inflation techniques of XS-Search are used to increase the accuracy of the attack to make the two response types (hit or miss) easier to distinguish. The following two mechanisms  allow attackers to make better measurements:
-
-- If a search system reflects certain GET parameters into the response when returning results, the size of the response increases. This makes the request more distinguishable because the time to prepare the response and send it over the network grows substantially.
-- Force the server to perform more computation work before returning a response. This approach can be applied in search systems offering more expressive query languages (e.g. exclude terms in Gmail needs to process every character in the results).
-
-## Extended Principle
-
-While the original research around XS-Search focused on timing attacks, the principle of the attack extends to other XS-Leaks. Instead of relying on timing measurements, which are unreliable, attackers can use other XS-Leaks to extract the same information.
-
-In a Query-Based Search System, a user submits queries and gets responses associated with those queries. This action can result in two different outcomes:
-
-1. The system shows results and the page behaves in a specific way (first state).
-2. The system does not show results and the page behaves in a different way than in step 1 (second state).
-
-If both behaviors above can be distinguished by a more reliable XS-Leak than timing, then an attacker could perform a more efficient XS-Search attack. For example, if the number of frames on a page varies based on search results (step 1 and 2 are distinguishable), this attack principle can be applied with a [Frame Counting]({{< ref "frame-counting.md" >}}) XS-Leak which could be more accurate than one using timing measurements.
+典型的な攻撃は、検索システムが結果を返すかどうかを検出するためにレスポンス時間を用いて、以下のように行われる。
 
 
-## Defense
+1. リクエストが、結果がヒットした場合の時間(hit）と、結果がヒットしなかった場合の時間(miss)を計測する。
+2. 検索エンドポイントへのリクエストに対して、[timing attack]({{< ref "./timing-attacks/network-timing.md" >}})を開始し、最初の文字 (`?q=r`) をブルートフォースで攻撃する。
+3. 2.で計測した時間が1.で計測したhitである場合、もう一文字追加する (`?q=ra`); そうでなければ、新しい文字 (`?q=s`) を試す。
+4. 最終的に、完全な秘密(`?q=secret`)を取得できる。
+
+
+この攻撃は、正確さを期すために複数のタイミング測定が必要であり、インフレーション技術や統計分析によって改善することができる。
+さらに、一文字ずつブルートフォースするのではなく、攻撃者は特定の単語や文章を検索し、結果の出現箇所のみを漏洩させることができる。
+
+この攻撃の最も重要な部分はその原理であり、様々なXS-Leaksに適用することが可能だからである。
+
+## レスポンス時間の増加方法
+
+XS-Searchのインフレーション技術は、2つのレスポンス（hitまたはmiss）を区別しやすくすることで攻撃の精度を上げるために使用される。
+以下の2つのメカニズムにより、攻撃者はより良い計測を行うことができる。
+
+- 検索システムが結果を返す際に、特定のGETパラメータをレスポンスに反映させると、レスポンスのサイズが大きくなる。これによりレスポンスをネットワーク上に送信する時間が大幅に増加するため、リクエストをより区別しやすくする。
+- レスポンスを返す前に、サーバーにもっと計算作業をさせる。この方法は、より表現力の高いクエリー言語を提供する検索システムに適用できる。（例：Gmailのexclude termsは結果内のすべての文字を処理する）
+
+## 拡張原理
+
+XS-Search に関するオリジナルの研究はタイミング攻撃に焦点を当てたものであったが、この攻撃の原理は他の XS-Leak にも拡張されている。
+前述のように信頼性の低いタイミング測定に頼るのではなく、攻撃者は他のXS-Leakを利用して同じ情報を抽出することができる。
+
+クエリベースの検索システムでは、ユーザーはクエリを送信し、そのクエリに関連するレスポンスを取得する。
+この動作は、2つの異なる結果をもたらす可能性がある。
+
+1. システムが結果を表示し、ページが特定の動作をする(第一状態)。
+2. システムが結果を表示せず、ページがステップ1とは異なる方法で動作する(第2の状態)。
+
+上記の両方の挙動をタイミングよりも信頼性の高いXS-Leakで区別できれば、攻撃者はより効率的なXS-Search攻撃を行うことができる。
+例えば、検索結果によってページのフレーム数が変化する（ステップ1と2が区別できる）場合、この攻撃原理は[Frame Counting]({{< ref "frame-counting.md" >}}) XS-Leakで適用でき、タイミング測定によるものよりも正確かもしれない。
+
+## 対策
 
 | Attack Alternative | [SameSite Cookies (Lax)]({{< ref "/docs/defenses/opt-in/same-site-cookies.md" >}}) | [COOP]({{< ref "/docs/defenses/opt-in/coop.md" >}}) | [Framing Protections]({{< ref "/docs/defenses/opt-in/xfo.md" >}}) |                                          [Isolation Policies]({{< ref "/docs/defenses/isolation-policies" >}})                                          |
 | :----------------: | :--------------------------------------------------------------------------------: | :-------------------------------------------------: | :---------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------: |
 | XS-Search (timing) |                                         ✔️                                          |                          ❌                          |                                 ❌                                 | [RIP]({{< ref "/docs/defenses/isolation-policies/resource-isolation" >}}) 🔗 [NIP]({{< ref "/docs/defenses/isolation-policies/navigation-isolation" >}}) |
 
-🔗 – Defense mechanisms must be combined to be effective against different scenarios.
+🔗 –異なるシナリオに対して有効な防御機構を組み合わせる必要がある。
 
 ## References
 

