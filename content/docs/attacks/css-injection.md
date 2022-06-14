@@ -10,25 +10,22 @@ menu = "main"
 weight = 11
 +++
 
-## CSS Injection
+## CSSインジェクション
 
 {{< hint warning >}}
-This group of XS-Leaks requires a CSS injection on the target page.
+ここで紹介される一連のXS-Leaksは対象ページでのCSSインジェクションを必要とします。
 {{< /hint >}}
 
-Among the different CSS injection vectors, the most noticeable one is the abuse of CSS Selectors. They can be used as an expression to match and select certain HTML elements. For example, the selector `input[value^="a"]` is matched if the value of an `input` tag starts with the character "a". So, to detect if a CSS Selector matches the expression, attackers can trigger a callback to one of their websites using certain properties like `background`, `@import`, etc. [^1] [^2]. The matching process can easily be brute-forced, and extended to the full string.
+CSSインジェクションの様々なベクトルの中で、最もよく見られるのは、CSSセレクタの悪用です。これらは、特定のHTML要素にマッチし、選択するための表現として使用することができます。例えば、セレクタ `input[value^="a"]` は、`input` タグの値が文字 "a" で始まっている場合にマッチングされます。したがって、ある CSS セレクタが表現にマッチするかどうかを検出するため、攻撃者は `background` や `@import` などのプロパティを使用して、自身の管理するウェブサイトへのコールバックをトリガーすることができます。[^1] [^2] このマッチングプロセスは簡単にブルートフォースされ、文字列全体に拡張できます。
 
-Page content such as JavaScript can be leaked by abusing Font [ligatures](https://wikipedia.org/wiki/Ligature_(writing)) as a sequence of characters can have its own representation.
+文字の並びに独自の表記がある場合、フォントの[合字](https://wikipedia.org/wiki/Ligature_(writing))を悪用して、ページに含まれるJavaScriptなどがリークされる可能性があります。
 
-Some HTML tags that are normally hidden such as style and script can be rendered as text by applying a style like `* { display: block; }`. Hence, their content could be potentially leaked as well. 
+`* { display: block; }`のようなスタイルを適用すると、スタイルやスクリプトなどの通常は隠されているHTMLタグも、テキストとして表示されることがあります。したがって、それらの内容もリークされる可能性があります。
 
-Larger text dimensions can result in the scroll bar being shown,  
-This scroll bar can have a custom style such as `background: url()` so that it makes a request to an attacker-controlled server when shown. [^3]
+## 対策
 
-## Defense
-- Put attacker controled content in its own document this can be done using a iframe with the srcdoc attrbute.
-Optionaly include the sandbox attbute to isolate the content into its own origin.
-- Use a CSS inliner so global styles get converted.
+- 攻撃者がコントロールするコンテンツを独立したドキュメントに置きます。これは srcdoc属性を持つiframeを使って行うことができます。オプションで、コンテンツを独自のオリジンに分離するためのサンドボックス属性を含めることができます。
+- CSSインライナーを使って、グローバルなスタイルが変換されるようにします。
 
 | [SameSite Cookies (Lax)]({{< ref "/docs/defenses/opt-in/same-site-cookies.md" >}}) | [COOP]({{< ref "/docs/defenses/opt-in/coop.md" >}}) | [Framing Protections]({{< ref "/docs/defenses/opt-in/xfo.md" >}}) |                  [Isolation Policies]({{< ref "/docs/defenses/isolation-policies" >}})                   |
 | :--------------------------------------------------------------------------------: | :-------------------------------------------------: | :---------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: |

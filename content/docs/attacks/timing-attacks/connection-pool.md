@@ -14,15 +14,18 @@ defenses = [
 menu = "main"
 +++
 
-Another way to measure the network timing of a request consists of abusing the socket pool of a browser [^1]. Browsers use sockets to communicate with servers. As the operating system and the hardware it runs on have limited resources, browsers have to impose a limit.
+network timingを測定する方法の一つとして、ブラウザのソケットプールを悪用する方法があります。
+ブラウザはサーバと通信するために、ソケットを利用します。
+ハードウェアやその上で動作するOSのリソースには限りがあるため、ブラウザにも制限をかけざるを得ません。
 
-To exploit the existence of this limit, attackers can:
-1. Check what the limit of the browser is, for example 256 global sockets.
-2. Block {{< katex>}}255{{< /katex >}} sockets for a long period of time by performing {{< katex>}}255{{< /katex >}} requests to different hosts that simply hang the connection
-3. Use the {{< katex>}}256^{th}{{< /katex >}} socket by performing a request to the target page.
-4. Perform a {{< katex>}}257^{th}{{< /katex >}} request to another host. Since all the sockets are being used (in steps 2 and 3), this request must wait until the pool receives an available socket. This waiting period provides the attacker with the network timing of the {{< katex>}}256^{th}{{< /katex >}} socket, which belongs to the target page. This works because the {{< katex>}}255{{< /katex >}} sockets in step 2 are still blocked, so if the pool received an available socket, it was caused by the release of the socket in step 3. The time to release the {{< katex>}}256^{th}{{< /katex >}} socket is directly connected with the time taken to complete the request.
+この制限の存在を悪用するために、攻撃者は下記のようなことができます。
 
-## Defense
+1. ブラウザの制限を確認する。
+2. 単に接続をハングアップさせる{{< katex>}}255{{< /katex >}}のリクエストを別々のホストに実行して、長時間{{< katex>}}255{{< /katex >}}のソケットをブロックする。
+3. ターゲットページに対するリクエストを実行して、{{< katex>}}256^{番目}{{< /katex >}}のソケットを利用する。
+4. 他のホストへの {{< katex>}}257^{番目}{{< /katex >}}のリクエストを実行します。(step2、3で)すべてのソケットが使用されているので、このリクエストは、プールが利用可能なソケットを受け取るまで待機する必要があります。この待ち時間は、ターゲットページに属する {{< katex>}}256^{番目}{{< /katex >}}のソケットのネットワークタイミングを、攻撃者に提供します。これが動作するのは、ステップ2の{{< katex>}}255{{< /katex >}}個のソケットがまだブロックされているので、ステップ3のソケットの解放によってプールが利用可能なソケットを受信した場合です。{{< katex>}}256^{番目}{{< /katex >}} のソケットを解放する時間は、リクエストを完了するのにかかった時間と直結しています。
+
+## 対策
 
 | [SameSite Cookies (Lax)]({{< ref "/docs/defenses/opt-in/same-site-cookies.md" >}}) | [COOP]({{< ref "/docs/defenses/opt-in/coop.md" >}}) | [Framing Protections]({{< ref "/docs/defenses/opt-in/xfo.md" >}}) | [Isolation Policies]({{< ref "/docs/defenses/isolation-policies" >}}) |
 | :--------------------------------------------------------------------------------: | :-------------------------------------------------: | :---------------------------------------------------------------: | :-------------------------------------------------------------------: |
@@ -30,9 +33,9 @@ To exploit the existence of this limit, attackers can:
 
 
 {{< hint info >}}
-Similar to [partitioned caches]({{< ref "../../defenses/secure-defaults/partitioned-cache.md" >}}), some browsers are considering to extend the principle of "split per site/origin" of resources to [socket pools](https://bugzilla.mozilla.org/show_bug.cgi?id=1572544).
+[partitioned caches]({{< ref "../../defenses/secure-defaults/partitioned-cache.md" >}})と同様に、リソースの"site/originごとの分割"の原理を[ソケットプール](https://bugzilla.mozilla.org/show_bug.cgi?id=1572544)に拡張することを、いくつかのブラウザが検討しています。
 {{< /hint >}}
 
-## References
+## 参考文献
 
 [^1]: Leak cross-window request timing by exhausting connection pool, [link](https://bugs.chromium.org/p/chromium/issues/detail?id=843157)
