@@ -1,5 +1,5 @@
 +++
-title = "Navigations"
+title = "画面遷移"
 description = ""
 date = "2020-10-01"
 category = [
@@ -24,20 +24,20 @@ menu = "main"
 weight = 2
 +++
 
-Detecting if a cross-site page triggered a navigation (or didn't) can be useful to an attacker. For example, a website may trigger a navigation in a certain endpoint [depending on the status of the user]({{< ref "#case-scenarios" >}}).
+クロスサイトのページで画面遷移がトリガーされたか（または、そうでないか）を検出することは攻撃者にとって有用です。例えば、ウェブサイトはユーザの状態に依存({{< ref "#case-scenarios" >}})して、あるエンドポイントで画面遷移をトリガーする可能性があります。
 
-To detect if any kind of navigation occurred, an attacker can:
+どのような画面遷移が発生したかを検出することで攻撃者以下の様なことが可能になります。
 
-- Use an `iframe` and count the number of times the `onload` event is triggered.
-- Check the value of `history.length`, which is accessible through any window reference. This provides the number of entries in the history of a victim that were either changed by `history.pushState` or by regular navigations. To get the value of `history.length`, an attacker changes the location of the window reference to the target website, then changes back to same-origin, and finally reads the value.
+- `iframe`を使用して`onload`イベントがトリガーされた回数を数える。
+- ウィンドウ参照を通じてアクセス可能な`history.length`の値をチェックする。この値は被害者の`history.pushState`や通常の画面遷移によって変更された履歴の数を提供しています。攻撃者は`history.length`の値を取得するためにウィンドウ参照のlocationをターゲットのウェブサイトに変更し、そしてSame-Originに戻すことによって最後に値を読み取ります。
 
-## Download Trigger
+## ダウンロードトリガー
 
-When an endpoint sets the [`Content-Disposition: attachment`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition) header, it instructs the browser to download the response as an attachment instead of navigating to it. Detecting if this behavior occurred might allow attackers to leak private information if the outcome depends on the state of the victim's account.
+エンドポイントが[`Content-Disposition: attachment`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition) ヘッダを設定すると、ブラウザにレスポンスをナビゲートさせるのではなくファイルとしてダウンロードすることを指示します。この挙動が発生したかを検出すると、結果が被害者の状態に依存する場合に攻撃者に機密情報をリークできる可能性があります。
 
-### Download bar
+### ダウンロードバー
 
-In Chromium-based browsers, when a file is downloaded, a preview of the download process appears in a bar at the bottom, integrated into the browser window. By monitoring the window height, attackers can detect whether the "download bar" opened:
+Chromeベースのブラウザではファイルをダウンロードする際に、ブラウザのウィンドウ下部にダウンロードの進捗を示すバーがウィンドウと一体化して表示されます。攻撃者ウィンドウの高さを監視することでダウンロードバーが開いているかどうかを検出することができます。
 
 
 ```javascript
@@ -57,14 +57,14 @@ setTimeout(() => {
 ```
 
 {{< hint important >}}
-This attack is only possible in Chromium-based browsers with automatic downloads enabled. In addition, the attack can't be repeated since the user needs to close the download bar for it to be measurable again.
+この攻撃は、自動ダウンロード機能が有効になっているChromeベースのブラウザでのみ有効です。加えてこの攻撃はユーザがダウンロードばーばを能動的に閉じないと再検出できないため、繰り返し行うことはできません。
 {{< /hint >}}
 
-### Download Navigation (with iframes)
+### iframeを利用したダウンロード遷移
 
-Another way to test for the [`Content-Disposition: attachment`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition) header is to check if a navigation occurred. If a page load causes a download, it does not trigger a navigation and the window stays within the same origin.
+[`Content-Disposition: attachment`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition) ヘッダをテストするもう一つの方法は遷移が発生したかどうかをチェックすることです。仮にページの読み込みによってダウンロードが発生した場合、遷移は発生せずウィンドウは同一オリジン内に留まります。
 
-The following snippet can be used to detect whether such a navigation has occurred and therefore detect a download attempt:
+以下のコードは、そのような遷移が発生したかを検出しダウンロードが試行されたかを検出します。
 
 ```javascript
 // Set the destination URL to test for the download attempt
@@ -87,16 +87,16 @@ iframe.onload = () => {
 ```
 
 {{< hint info >}}
-When there is no navigation inside an `iframe` caused by a download attempt, the `iframe` does not trigger an `onload` event directly. For this reason, in the example above, an outer `iframe` was used instead, which listens for an `onload` event which triggers when subresources finish loading, including `iframe`s.
+ダウンロードを試行することにより`iframe`内で画面遷移が発生しない場合、`iframe`は`onload`イベントを直接トリガーしません。そのため、上記の例では代わりに外側に`iframe`を使用し、その中の`iframe`を含むサブリソースの読み込みが完了した際にトリガーされる`onload`イベントを待ち受けます。
 {{< /hint >}}
 
 {{< hint important >}}
-This attack works regardless of any [Framing Protections]({{< ref "xfo" >}}), because the `X-Frame-Options` and `Content-Security-Policy` headers are ignored if `Content-Disposition: attachment` is specified.
+この攻撃はどのような[Framing Protections]({{< ref "xfo" >}}にかかわらず動作します。 `Content-Disposition: attachment`が指定されると`X-Frame-Options`と`Content-Security-Policy`ヘッダは無視されるからです。
 {{< /hint >}}
 
-### Download Navigation (without iframes)
+### ダウンロード遷移（iframeなし）
 
-A variation of the technique presented in the previous section can also be effectively tested using `window` objects:
+前項で紹介した手法は`window`オブジェクトを利用しても効果的にテストすることができます。
 
 ```javascript
 // Set the destination URL
@@ -117,22 +117,23 @@ setTimeout(() => {
 }, 2000);
 ```
 
-## Server-Side Redirects
+## サーバサイドリダイレクト
 
-### Inflation
+### インフレ
 
-A server-side redirect can be detected from a cross-origin page if the destination URL increases in size and contains an attacker-controlled input (either in the form of a query string parameter or a path). The following technique relies on the fact that it is possible to induce an error in most web-servers by generating large request parameters/paths. Since the redirect increases the size of the URL, it can be detected by sending exactly one character less than the server's maximum capacity. That way, if the size increases, the server will respond with an error that can be detected from a cross-origin page (e.g. via Error Events).
+サーバサイドリダイレクトは、宛先URLのサイズと攻撃者によって制御されている入力値（クエリ文字列またはパスのいずれか）が増加する場合、クロスオリジンのページから検出することができます。以下の手法は大きなクエリ文字列やパスを生成する子男でほとんどのWEBサーバでエラーを誘発することが可能であるという事実に依存しています。リダイレクトはURLのサイズを増加させるため、サーバが処理可能なURLの最大長より正確に1文字減らすることで検出することができます。これによりサイズが大きくなった場合、サーバはクロスオリジンのページから検出可能なエラーを応答します。（例えばエラーイベント経由）
 
 {{< hint example >}}
-An example of this attack can be seen [here](https://xsleaks.github.io/xsleaks/examples/redirect/).
+攻撃の例はこちらで確認することができます。 [here](https://xsleaks.github.io/xsleaks/examples/redirect/).
 {{< /hint >}}
-## Cross-Origin Redirects
 
-### CSP Violations
+## クロスオリジンリダイレクト
 
-[Content-Security-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) (CSP) is an in-depth defense mechanism against XSS and data injection attacks. When a CSP is violated, a `SecurityPolicyViolationEvent` is thrown. An attacker can set up a CSP using the [`connect-src` directive](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/connect-src) which triggers a `Violation` event every time a `fetch` follows an URL not set in the CSP directive. This allows an attacker to detect if a redirect to another origin occurred [^2] [^3].
+### CSP 侵害
 
-The example below triggers a `SecurityPolicyViolationEvent` if the website set in the fetch API (line 6) redirects to a website other than `https://example.org`:
+[Content-Security-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) (CSP) はクロスサイトスクリプティングやデータインジェクションに対する綿密な防御機構です。CSPが侵害されると`SecurityPolicyViolationEvent` がトリガーされます。攻撃者は[`connect-src` ディレクティブ](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/connect-src) を利用してCSPを設定することができます。このディレクティブは`fetch` がCSPディレクティブで設定されていないURLを追うたびに`Violation`イベントがトリガーされます。これによって攻撃者は他のオリジンへのリダイレクトが発生したかを検出することができます。
+
+以下の例では、fetch APIで設定（6行目）したウェブサイトが`https://example.com`以外のウェブサイトにリダイレクトされると`SecurityPolicyViolationEvent` がトリガーされます。
 
 {{< highlight html "linenos=table,linenostart=1" >}}
 <!-- Set the Content-Security-Policy to only allow example.org -->
@@ -152,9 +153,9 @@ fetch('https://example.org/might_redirect', {
 </script>
 {{< / highlight >}}
 
-When the redirect of interest is cross-site and conditioned on the presence of a cookie marked `SameSite=Lax`, the approach outlined above won't work, because `fetch` doesn't count as a top-level navigation. In a case like this, the attacker can use another CSP directive, [`form-action`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/form-action), and leverage the fact that submitting a HTML form using `GET` as its method does count as a top-level navigation.
+攻撃対象のリダイレクトがクロスサイトであることと、`SameSite=Lax`と設定されたクッキーの存在が条件である場合、`fetch`はトップレベルの遷移としてカウントされないため上記の手法は動作しません。このような場合、攻撃者は別のCSPディレクティブである[`form-action`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/form-action)と、`GET`を使ってHTMLフォームを送信するとトップレベル遷移としてカウントされるという事実を利用することができます。
 
-The example below triggers a `SecurityPolicyViolationEvent` if the form's action (line 3) redirects to a website other than `https://example.org`:
+以下の例では、フォームのアクション（3行目）が`https://example.org`以外にリダイレクトされると`SecurityPolicyViolationEvent`がトリガーされます。
 
 {{< highlight html "linenos=table,linenostart=1" >}}
 <!-- Set the Content-Security-Policy to only allow example.org -->
@@ -172,13 +173,13 @@ document.forms[0].submit();
 </script>
 {{< / highlight >}}
 
-Note that this approach is unviable in Firefox (contrary to Chromium-based browsers) because `form-action` doesn't block redirects after a form submission in that browser.
+FireFoxではChromeベースのブラウザとは異なり`form-action`がform送信後にリダイレクトをブロックしないため、この手法は実行できないことに注意してください。
 
-## Case Scenarios
+## 攻撃シナリオ
 
-An online bank decides to redirect wealthy users to attractive stock opportunities by triggering a navigation to a reserved space on the website when these users consult their account balance. If this is only done for a specific group of users, it becomes possible for an attacker to leak the "client status" of the user.
+とあるオンラインバンクでは富裕層ユーザが口座の残高を確認した際に、ウェブサイト上の予約ページへナビゲーションをトリガーすることにより魅力的な株の投資機会へリダイレクトすることになっています。このように特定のユーザグループに対してのみ行われている場合、攻撃者に顧客ステータスがリークされます。
 
-## Partitioned HTTP Cache Bypass
+## 分割されたHTTPキャッシュの回避
 
 If a site `example.com` includes a resource from `*.example.com/resource` then that resource will have the same caching key as if the resource was directly requested through top-level navigation. That is because the caching key is consisted of top-level *eTLD+1* and frame *eTLD+1*. [^cache-bypass]
 

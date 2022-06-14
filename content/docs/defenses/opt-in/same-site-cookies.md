@@ -8,40 +8,39 @@ category = [
 menu = "main"
 +++
 
-SameSite cookies are one of the most impactful modern security mechanisms for fixing security issues that involve cross-site requests. This mechanism allows applications to force browsers to only include cookies in requests that are issued same-site [^1]. This type of cookie has three modes: `None`, `Lax`, and `Strict`.
+SameSite Cookieは、クロスサイトリクエストを含むセキュリティ問題を修正するための、最もインパクトのある最新のセキュリティ機構の一つです。この機構によって、アプリケーションはブラウザに、同じサイト [^1]で発行されたリクエストにのみCookieを含めるように強制することができます。SameSite Cookieには、`None`、`Lax`、`Strict` の 3 つのモードがあります。
 
 ## SameSite Cookie Modes
 
-The following SameSite cookie modes are available:
+SameSite Cookieのモードは以下の通りです。
 
-* `None` – Disables all protections and restores the old behavior of cookies. This mode is not recommended.
+* `None` – SameSite Cookieによるすべての保護機能を無効化し、Cookieの旧来の動作に元します。このモードは推奨されません。
 
-  {{< hint important >}}
-  The `None` attribute must be accompanied by the `Secure` flag [^same-site-none].
-  [^same-site-none]: SameSite cookies explained, [link](https://web.dev/samesite-cookies-explained/#samesitenone-must-be-secure)
-  {{< /hint >}}
+{{< hint important >}}
+`None` 属性を設定するには、そのCookieに `Secure` 属性を付与しなければなりません。 [^1]
+{{< /hint >}}
 
 
-* `Strict` – Causes the browser to not include cookies in any cross-site requests. This means `<script src="example.com/resource">`, `<img src="example.com/resource">`, `fetch()`, and `XHR` will all make requests without the SameSite `Strict` cookies attached. Even if the user clicks on a link to `example.com/resource`, their cookies are not included.
+* `Strict` – ブラウザがクロスサイトリクエストにCookieを含めないようにします。これは、 `<script src="example.com/resource">`, `<img src="example.com/resource">`, `fetch()`、や `XHR` が元になるリクエストには `Strict` モードのCookieを付けずに送信します。 たとえユーザが `example.com/resource` のリンクをクリックしたとしてもそのリクエストにCookieは含まれません。
 
-* `Lax` – The only difference between `Lax` and `Strict` is that `Lax` mode allows cookies to be added to requests triggered by cross-site top-level navigations. This makes `Lax` cookies much easier to deploy since they won't break incoming links to your application. Unfortunately, an attacker can trigger a top-level navigation via `window.open` that allows the attacker to maintain a reference to the `window` object.
+* `Lax` – `Lax`と`Strict`の唯一の違いは、`Lax`モードではトップレベルの遷移によって発生するクロスサイトリクエストにはCookieを付けることができるということです。`Lax` モードはアプリケーションへの導線リンクを破壊しないため、設定がより簡単になります。残念ながら、攻撃者は`window.open` を通じてトップレベルの遷移を引き起こすことができ、それによって攻撃者は`window`オブジェクトへの参照を維持することができます。
 
 ## Considerations
 
-`Strict` cookies provide the strongest security guarantees, but it can be very difficult to deploy `Strict` same-site cookies in an existing application.
+`Strict`モードのCookieは最強のセキュリティ保護を提供しますが、既存のアプリケーションに`Strict`モードのSameSite Cookieを設定することは難しいでしょう。
 
-SameSite cookies are neither bulletproof [^2] nor can they fix everything. To complement this defense strategy against XS-Leaks, applications should consider implementing other, additional protections. For example, [COOP]({{< ref "coop.md" >}}) can prevent an attacker from controlling pages using a `window` reference after the first navigation even if SameSite cookies in `Lax` mode are used.
+SameSite Cookieは防弾でもなければ [^2]、すべてを解決できる技術ではありません。XS-Leaksに対するこの防御戦略を完全なものにするために、アプリケーションは他の追加的な防御を実装することを検討するべきです。例えば、[COOP]({{< ref "coop.md" >}}) は `Lax` モードの SameSite Cookieが使われたとしても、最初のナビゲーション以降、攻撃者が `window` 参照を使ってページをコントロールするのを防ぐことができます。
 
 {{< hint important >}}
-Some browers may not use the default of Lax, So explicitly set the SameSite attrbute to ensure its enforced. 
-By default, cookies in Chrome without `SameSite` attribute will default to `Lax` mode. However, there is an exception for that behavior for cookies set less than 2 minutes ago that are sent via POST requests. [^3]
+ブラウザによっては、Cookieのデフォルト動作として`Lax`モードを使用しない場合があるので、SameSite属性を明示的に設定し、確実に実行されるようにしてください。
+Google Chromeのデフォルトでは、`SameSite`属性を持たないCookieは`Lax`モードがデフォルトの動作になります。しかし、POSTリクエストで送信される際、設定されてから2分未満のCookieについては例外的にクロスサイトであってもCookieが付与されます。[^3]
 
 [^3]: Cookies default to SameSite=Lax, [link](https://www.chromestatus.com/feature/5088147346030592)
 {{< /hint >}}
 
 ## Deployment
 
-Anyone interested in deploying this mechanism in web applications should take a careful look at this [web.dev](https://web.dev/samesite-cookie-recipes/) article.
+この機構をWebアプリケーションに導入することに興味がある場合は [web.dev](https://web.dev/samesite-cookie-recipes/) の記事を見てください。
 
 ## References
 

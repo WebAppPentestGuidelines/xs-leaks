@@ -1,41 +1,40 @@
 ---
 weight: 20
 bookFlatSection: true
-title: "Defense Mechanisms"
+title: "対策の仕組み"
 ---
 
-# Defense Mechanisms
+# 対策の仕組み
 
-Defending against all possible [XS-Leaks Attack Vectors]({{< ref "../attacks/" >}}) is not a trivial task. Each one of the attack vectors affects different web and browser components and has its quirks. Some bug bounty programs, such as Google VRP, even stopped paying for new XS-Leaks reports as they are focusing on large systemic changes to defend against XS-Leaks [^1]. Google and many other companies believe that the right approach to fixing XS-Leaks is to invest time and engineering power into [new large scale mitigations and changes to the web platform]({{< relref "_index.md#opt-in-mechanisms" >}}) that applications can use to mitigate entire categories of XS-Leaks.
+[XS-Leaks Attack Vectors]({{< ref "../attacks/" >}}) をすべて対策することは容易ではありません。攻撃ベクトルの一つ一つは異なるウェブやブラウザのコンポーネントに影響を与え、そしてそれには癖があります。Google VRPのような一部のバグバウンティプログラムは彼らが大規模な改修に注力するために新しいXS-Leaksの報告に対して支払いを停止しました。[^1] Googleなどの他の多くの企業はXS-Leaksを修正するには、アプリケーションがXS-Leaks全カテゴリを緩和するのに有効な [new large scale mitigations and changes to the web platform]({{< relref "_index.md#opt-in-mechanisms" >}}) に時間とエンジニアリングを投資が正しいアプローチだと信じています。
 
-Browsers now provide a number of useful opt-in mechanisms that can be used to mitigate XS-Leaks. While these provide strong protections, the disadvantage is that they are not yet well supported by every browser. Defending against XS-Leaks effectively requires a mixture of different techniques, each of which is described in detail below.
+現在ブラウザはXS-Leaksを軽減するために使用できるオプトインの仕組みを多数提供しています。これらは強力な保護機能を提供しますが、すべてのブラウザでまだ十分にサポートされていないことが欠点です。XS-Leaksを効果的に対策するためには、様々な手法を組み合わせる必要があります。
 
-## Opt-in Mechanisms
+## オプトインの仕組み
 
-These [defense mechanisms]({{< ref "opt-in/_index.md" >}}) allow applications to address classes of similar XS-Leaks at the same time. These protections can either allow applications to change the behavior of the browser or provide additional information that applications can use to change their own behavior.
+これらの [defense mechanisms]({{< ref "opt-in/_index.md" >}}) によってアプリケーションは類似した XS-Leaks に一括に対応することができます。これらの防御は、アプリケーションがブラウザの挙動を変更できるようにするか、あるいはアプリケーション自身の動作を変更するために使用できる追加情報を提供することです。
 
 {{< hint tip >}}
-Deploying a combination of opt-in defense mechanisms should be the default strategy. Not only do they protect against XS-Leaks, but also against other vulnerabilities such as XSSI, Clickjacking, CSRF, etc.
+オプトインによる防御の仕組みはデフォルトの戦略であるべきです。XS-Leaksに対してだけでなく、XSSI、クリックジャッキング、CSRFといった他の脆弱性に対しての対策にもなります。
 {{< /hint >}}
 
 {{< hint important >}}
-When using any mitigations that rely on browser support, be sure to check that they are well supported by your customers' browsers. For example, `fetch metadata` headers are a great tool, but are currently only supported in Chromium-based browsers. Check [MDN](https://developer.mozilla.org/en-US/) for up-to-date information on browser support for different standards.
+ブラウザのサポートに依存する緩和策を使用する場合、ユーザのブラウザで十分にサポートされていることを必ず確認してください。例えば `fetch metadata` ヘッダは素晴らしいツールですが現在はChromiumベースのブラウザだけでしかサポートされていません。異なる仕様に対するブラウザサポートの最新情報については、[MDN](https://developer.mozilla.org/en-US/)を確認してください。
 {{< /hint >}}
 
 ## Application Design
 
-Application design [techniques]({{< ref "design-protections/_index.md" >}}) are focused on carefully designing the application in a way that prevents XS-Leaks. This is a very useful approach when it is not practical to enable stronger global protections immediately. The other big advantage is that careful application design can stop XS-Leaks even on older browsers that don't support the newest browser standards.
+アプリケーションの設計[手法]({{< ref "design-protections/_index.md" >}})はXS-Leaksをアプリケーションの設計段階で防止する方法に重点を置いています。これは、より強力で全体的な保護をすぐに有効にすることが現実的でない場合に、非常に有用なアプローチです。もう一つの大きな利点は、最新のブラウザ仕様をサポートしていない古いブラウザでも、注意深くアプリケーションを設計することでXS-Leaksを阻止できることです。
 
 {{< hint note >}}
-It is very difficult to use application design techniques to block every XS-Leak technique across an entire application. While application design techniques are effective at stopping severe leaks, [opt-in mechanisms]({{< relref "_index.md#opt-in-mechanisms" >}}) provided by the browser are a better overall solution.
+アプリケーションの設計技術を使って、アプリケーション全体ですべてのXS-Leak技術を防御することは極めて困難です。 アプリケーション設計の手法は深刻なリークを防ぐのに有効ですが、ブラウザが提供する[opt-in mechanisms]({{< relref "_index.md#opt-in-mechanisms" >}}) は全体的な解決策として優れています
 {{< /hint >}}
 
 ## Secure Defaults
 
-Browser vendors are actively working on changing [default behaviors]({{< ref "secure-defaults/_index.md" >}}) to help mitigate some of the XS-Leaks mentioned in this wiki. Changing default behaviors is a balancing act between improving security and preserving backwards compatibility.
-
+ブラウザベンダーは、このWikiで言及されている いくつかのXS-Leaksの影響を緩和するために[default behaviors]({{< ref "secure-defaults/_index.md" >}})を変更することに積極的に取り組んでいます。ブラウザのデフォルトの動作を変更することはセキュリティの向上と後方互換性維持の間でバランスをとることです。
 {{< hint important >}}
-Secure defaults are amazing! They can help protect applications and users without any additional effort from developers. But note that they're unlikely to completely prevent XS-Leaks.
+セキュアデフォルトは素晴らしいものです！開発者が更に努力することなくアプリケーションとユーザを保護することができます。しかし、XS-Leaksを完全に防ぐことはできないので注意してください。
 {{< /hint >}}
 
 ## References
