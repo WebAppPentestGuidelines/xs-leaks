@@ -8,18 +8,23 @@ category = [
 menu = "main"
 +++
 
-A considerable number of XS-Leaks rely on some of the properties of iframes. If an attacker is unable to embed the contents of a page as an `iframe`, `frame`, `embed` or `object`, then the attack may no longer be possible. To mitigate XS-Leaks which rely on these objects, pages can forbid or select which origins can embed them. Doing so is possible by using the [`X-Frame-Options` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options) or the [CSP frame-ancestors directive](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/frame-ancestors).
+かなりの数のXS-Leaksがiframeのプロパティの一部に依存しています。攻撃者がページのコンテンツを`iframe`, `frame`, `embed` または `object`として埋め込むことができない場合、攻撃は不可能になる可能性があります。
 
-Since a website enforcing Framing Protections can't be embedded from an attacker origin, the website is not rendered and the JavaScript does not run. Therefore, none of its subresources (images, JS, or CSS) are retrieved by the browser.
+これらのオブジェクトに依存するXSリークを軽減するために、ページはそれらを埋め込むことができるオリジンを禁止または選択できます。
+このためには、[`X-Frame-Options` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options) や [CSP frame-ancestors directive](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/frame-ancestors)を使います。
+
+Framing Protectionsを適用するWebサイトは攻撃者の発信元から埋め込むことができないため、Webサイトはレンダリングされず、JavaScriptは実行されません。したがって、そのサブリソース（画像、JS、またはCSS）はいずれもブラウザによって取得されません。
 
 {{< hint tip >}}
-The [CSP frame-ancestors directive](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/frame-ancestors) is the more modern way of enabling framing protections. However, it is not supported by Internet Explorer, so in many cases it is recommended to use it in conjunction with the [`X-Frame-Options` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options).
+ [CSP frame-ancestors directive](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/frame-ancestors) は 、Framing Protectionsを有効にする最新の方法です。ただし、Internet Explorerではサポートされていないため、多くの場合、ヘッダーと組み合わせて使用​​することをお勧めします。
+
+ただし、Internet Explorerではサポートされていないため、多くの場合、 [`X-Frame-Options` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options)ヘッダーと組み合わせて使用​​することをお勧めします。
 {{< /hint >}}
 
 ## Considerations
 
-This protection is very effective against XS-Leaks that [rely on framing](../../../../abuse/iframes/) and can be easily implemented without breaking the vast majority of applications. This mechanism not only protects against some XS-Leaks, but also prevents attacks like [clickjacking](https://owasp.org/www-community/attacks/Clickjacking).
+この保護は、[rely on framing](../../../../abuse/iframes/)に依存するXSリークに対して非常に効果的であり、アプリケーションの大部分を壊すことなく簡単に実装できます。このメカニズムは、一部のXS-Leaksから保護するだけでなく、 [clickjacking](https://owasp.org/www-community/attacks/Clickjacking)などの攻撃も防ぎます。
 
 ## Deployment
 
-Deploying framing protections is usually straightforward as many applications are not meant to be embedded cross-origin in an `iframe`. Check out this [web.dev](https://web.dev/same-origin-policy/) article to learn more about the advantages of this header.
+多くのアプリケーションはクロスオリジンで`iframe`に埋め込まれることを意図していないため、Framing Protectionsのデプロイは通常簡単です。このヘッダーの利点の詳細については、[web.devの記事](https://web.dev/same-origin-policy/) を確認してください。
