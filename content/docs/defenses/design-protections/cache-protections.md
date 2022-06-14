@@ -8,57 +8,70 @@ category = [
 menu = "main"
 +++
 
-There are a number of different approaches applications can use to defend against cache probing-based XS-Leaks. These approaches are explained in the following sections.
+cache probingをベースとしたXS-Leakを対策するために、アプリケーションで利用できるさまざまなアプローチがあります。
+これらのアプローチについて、以下のセクションで説明します。
 
-# Cache Protection via `Cache-Control` Headers
+# `Cache-Control`ヘッダによるキャッシュ保護
 
-If it is acceptable to disable caching, doing so provides a strong defense against cache probing attacks. Disabling caching means that every time someone loads a resource, the resource has to be fetched again. To disable caching, set a `Cache-Control: no-store` header on every single response that you wish to protect.
+キャッシングを無効化することが許容できる場合には、cache probing攻撃に対する強力な対策となります。
+キャッシュを無効化すると、リソースを読み込むたびに、リソースを再度フェッチする必要があります。
+キャッシュを無効化するには、保護したいすべてのレスポンスに `Cache-Control：no-store`ヘッダを設定します。
 
-Advantages:
-* Supported by all major browsers
+メリット：
+* すべての主要なブラウザでサポートされている
 
-Disadvantages:
-* Negatively impacts site performance
+デメリット:
+* Webサイトのパフォーマンスに悪影響を与える
 
-# Cache Protection via Random Tokens
+# ランダムなトークンによるキャッシュ保護
 
-Rather than disabling caching, applications can include additional data in URLs in order to defend against cache probing attacks. This can be achieved by including a random token in the URL of every subresource that you reference. If an attacker cannot guess this random token, then the attacker cannot determine whether items are in the cache via any straightforward techniques.
-
-{{< hint example >}}
-Suppose that every page on your application loads the user's profile photo: `/user/<USERNAME>.png`. An attacker could check which user is signed in by probing the cache for `/user/john.png`, `/user/jane.png`, and so on.
-
-This is where a random token can come into play. If implemented, the application takes the user's profile photo from `/user/<USERNAME>.png?cache_buster=<RANDOM_TOKEN>` on every load. The server does not need to do anything with this random token. It is there purely to ensure that there is no way for an attacker to probe the cache without knowing the random token.
-{{< /hint >}}
-
-If implemented carefully, an application could even have a user-specific random token that is reused across page loads. This would allow subresources to still be cached since the URL would remain constant for a given user.
-
-Advantages:
-* Supported by every major browser
-* Does not break caching
-
-Disadvantages:
-* Difficult to implement
-
-# Cache Protection via Fetch Metadata
-
-[Fetch-Metadata]({{< ref "../opt-in/fetch-metadata.md" >}}) is meant to allow servers to determine how and why a request was initiated on the client side. One piece of information that is exposed is the [`Sec-Fetch-Site`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Sec-Fetch-Site) header which specifies whether a request is coming from the same origin or a different origin. This can be combined with the [`Vary`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Vary) header in order to force the browser to segment the cache based on whether a request is made from the same origin or a different origin.
-
-This is done by setting `Vary: Sec-Fetch-Site` on all resources you wish to protect.
+キャッシュの無効化ではなく、cache probing攻撃を対策するために、アプリケーションがURLに追加のデータを含める方法もあります。
+これは、参照するすべてのサブリソースのURLにランダムなトークンを含めることで実現できます。
+攻撃者がこのランダムなトークンを推測できなければ、単純な手法では、攻撃者はキャッシュ内にアイテムがあるかを判断できません。
 
 {{< hint example >}}
-Assume we have the resource `cdn.example.com/image.png` that we wish to protect from cache probing attacks. If we set `Vary: Sec-Fetch-Site` on it, this leads to the following behavior:
+アプリケーションのすべてのページにユーザーのプロフィール写真 `/user /<USERNAME>.png` が読み込まれるとします。
+攻撃者は `/user/john.png` , `/user/jane.png` などのキャッシュを調査することにより、どのユーザーがサインインしているかを判定できます。
 
-1. If `example.com` tries to load the resource, the request is initiated by the same site so it is cached under `(SFS: same-site, resource_url)`
-2. If `cdn.example.com` tries to load the resource, the request is initiated by the same origin so it is cached under `(SFS: same-origin, resource_url)`
-3. If `evil.com` tries to load the resource, the request is initiated by a different site so it is cached under `(SFS: cross-site, resource_url)`
-
-Note that this means cross-site requests are separated from same-site and same-origin requests.
+ここでランダムなトークンが活用できます。
+もし実装されていれば、アプリケーションは読み込みのたびに `/user/<USERNAME>.png？cache_buster=<RANDOM_TOKEN>` からユーザーのプロフィール写真を取得します。
+サーバは、このランダムなトークンに対して何も行う必要はありません。
+これは純粋に、攻撃者がランダムなトークンを知らないためにキャッシュを調査できないことを、実現するためだけのものとなります。
 {{< /hint >}}
 
-Advantages:
-* Does not break caching
+もっと丁寧に実装するのであれば、アプリケーションがページの読み込みに渡って再利用することができるユーザー固有のランダムなトークンを持つこともできます。
+これにより、特定のユーザに対してURLが一定に保たれるため、サブリソースをキャッシュすることができます。
 
-Disadvantages:
-* Fetch metadata is a new standard that is currently only supported in Chromium-based browsers (e.g. Chrome and Edge)
-* Cross-site subresources loaded on the page are not protected (e.g. subresources from CDNs)
-* If third parties load the resource, they are not protected
+メリット：
+* すべての主要なブラウザでサポートされている
+* キャッシングを阻害しない
+
+デメリット：
+* 実装が難しい
+
+# Fetch Metadataによるキャッシュ保護
+
+[Fetch-Metadata]({{< ref "../opt-in/fetch-metadata.md" >}}) は、クライアント側でリクエストが開始された方法と理由をサーバが判断できるようにすることを目的としています。
+公開される情報の1つは、リクエストが同じオリジンからのものか、別のオリジンからのものかを指定する[`Sec-Fetch-Site`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Sec-Fetch-Site) ヘッダです。
+[`Vary`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Vary)ヘッダと組み合わせることで、リクエストが同じオリジンから行われたか、異なるオリジンから行われたかに基づいて、ブラウザにキャッシュをセグメント化させることができます。
+
+これは、保護したいすべてのリソースに `Vary: Sec-Fetch-Site` を設定することで実現できます。
+
+{{< hint example >}}
+cache probing 攻撃から保護したいリソース`cdn.example.com/image.png`があると仮定します。 
+`Vary：Sec-Fetch-Site`を設定すると、以下のように動作します。
+
+1. `example.com`がリソースを読み込もうとすると、リクエストは同じサイトによって開始されるため、`(SFS: same-site, resource_url)`にキャッシュされます。
+2. `cdn.example.com`がリソースを読み込もうとすると、リクエストは同じオリジンによって開始されるため、`(SFS: same-origin, resource_url)`にキャッシュされます。
+3. `evil.com`がリソースを読み込もうとすると、リクエストは別のサイトによって開始されるため、`(SFS: cross-site, resource_url)`にキャッシュされます。
+
+これは、クロスサイトリクエストが同一サイトおよび同一生成元のリクエストから分離されることを意味することに注意してください。
+{{< /hint >}}
+
+メリット：
+* キャッシングを阻害しない
+
+デメリット：
+* Fetch Metadataは、新しい標準であり、現在Chromiumベースのブラウザ（ChromeやEdgeなど）でのみサポートされている
+* ページに読み込まれたクロスサイトのサブリソースは保護されない（例：CDNからのサブリソース）
+* サードパーティがリソースを読み込む場合には、保護されない
