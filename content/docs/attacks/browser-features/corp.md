@@ -14,19 +14,19 @@ menu = "main"
 weight = 2
 +++
 
-## Explanation
+## 説明
 
-[Cross-Origin Resource Policy]({{< ref "/docs/defenses/opt-in/corp.md" >}}) (CORP) is a web platform security feature that allows websites to prevent certain resources from being loaded by other origins. This protection complements [CORB]({{< ref "/docs/defenses/secure-defaults/corb.md" >}}) since it is an opt-in defense, whereas CORB blocks some cross-origin reads by default. Unfortunately, similar to [CORB]({{< ref "corb.md" >}}), applications can introduce a new XS-Leak if they misconfigure the use of this protection.
+[Cross-Origin Resource Policy]({{< ref "/docs/defenses/opt-in/corp.md" >}}) (CORP) は、Webプラットフォームセキュリティ機能で、Webサイトが特定のリソースを他のオリジンから読み込むことを防止することができます。[CORB]({{< ref "/docs/defenses/secure-defaults/corb.md" >}})がデフォルトで一部のクロスオリジン読み込みをブロックするのに対し、CORPはオプトインの防御であるため、この保護機能はCORBを補完するものです。残念ながら、[CORB]({{< ref "corb.md" >}})と同様に、アプリケーションがこの保護の使用を誤って設定すると、新しいXS-Leakを導入する可能性があります。
 
-A webpage will introduce an XS-Leak if `CORP` is enforced based on user data. If a page search feature enforces `CORP` when showing results, but doesn't do so when returning no results, an attacker will be able to distinguish the two scenarios. This occurs because a page/resource protected by `CORP` will return an error when fetched cross-origin.
+`CORP`がユーザーデータに基づいて強制される場合、ウェブページはXS-Leakを導入することになります。ページ検索機能が、結果を表示するときは`CORP`を強制し、結果を返さないときはそうしない場合、攻撃者は2つのシナリオを区別することができます。これは、`CORP`によって保護されたページ/リソースがクロスオリジンでフェッチされるとエラーを返すために発生します。
 
-## Defense
+## 対策
 
-An application can avoid this XS-Leak if it guarantees `CORP` is deployed in all application resources/endpoints. Moreover, generic security mechanisms that allow the invalidation of cross-site requests will also help prevent this attack.
+アプリケーションは、CORPがすべてのアプリケーションリソース/エンドポイントに展開されていることを保証すれば、このXS-Leakを回避することができます。さらに、クロスサイトリクエストの無効化を可能にする一般的なセキュリティメカニズムも、この攻撃を防ぐのに役立ちます。
 
 | [SameSite Cookies (Lax)]({{< ref "/docs/defenses/opt-in/same-site-cookies.md" >}}) | [COOP]({{< ref "/docs/defenses/opt-in/coop.md" >}}) | [Framing Protections]({{< ref "/docs/defenses/opt-in/xfo.md" >}}) |                                          [Isolation Policies]({{< ref "/docs/defenses/isolation-policies" >}})                                          |
 | :--------------------------------------------------------------------------------: | :-------------------------------------------------: | :---------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------: |
 |                                         ✔️                                          |                          ❌                          |                                 ❌                                 | [RIP]({{< ref "/docs/defenses/isolation-policies/resource-isolation" >}}) 🔗 [NIP]({{< ref "/docs/defenses/isolation-policies/navigation-isolation" >}}) |
 
-🔗 – Defense mechanisms must be combined to be effective against different scenarios.
+🔗 – 異なるシナリオに対して有効な防御機構を組み合わせる必要があります。
 
