@@ -17,8 +17,6 @@ Scroll to Text Fragment (STTF) は、ユーザーがウェブページのテキ�
 ## 期待される課題・議論される課題
 
 この機能の仕様に関する初期の議論では、単純な実装でいくつかのXS-Leakが導入できることが示されました[^1]。この仕様では、様々な攻撃シナリオ[^3]が考慮されており、Googleの研究結果も同様です[^4]。この機能を実装する際、ブラウザが注意すべきXS-Leakの可能性の1つは、以下の通りです。
-In early discussions regarding the specification of this feature it was shown that several XS-Leaks could be introduced with a naïve implementation [^1]. The specification considers various attack scenarios [^3], as does research from Google [^4]. One possible XS-Leak browsers need to be aware of when implementing this feature is:
-
 - 攻撃者は、ページを`iframe`として埋め込むことで、親ドキュメントの`onblur`イベントを聞くことによって、ページがテキストにスクロールされたかどうかを検出することができます。この方法は、[ID Attribute XS-Leak]({{< ref "id-attribute.md" >}})と類似しています。このシナリオは、Chromeの実装[^5]では、トップレベルのナビゲーションで発生するフラグメントナビゲーションのみを許可しているため、緩和されています。
 
 ## 現在の課題

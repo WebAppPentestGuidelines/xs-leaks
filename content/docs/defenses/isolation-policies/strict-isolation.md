@@ -19,7 +19,7 @@ Strict Isolation Policyは、すべてのクロスサイトインタラクショ
 
 ## Fetch Metadataを用いた実装
 
-以下のスニペットは、アプリケーションによる Strict Isolation Policy の実装例を示しています。
+以下のスニペットは、アプリケーションによる Strict Isolation Policy の実装例を示しています:
 
 ```py
 # クロスオリジンリクエストを拒否し、CSRFやXSSI、他のバグから保護します

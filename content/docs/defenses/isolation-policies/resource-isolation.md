@@ -40,7 +40,7 @@ def allow_request(req):
 ```
 
 ## 考慮事項
-Resource Isolation Policyから明示的に除外されていないすべてのリクエストに `Cross-Origin-Resource-Policy: same-site` レスポンスヘッダを設定しても問題ないはずです。[CORP]({{< ref "../opt-in/corp.md" >}}を参照してください。
+Resource Isolation Policyから明示的に除外されていないすべてのリクエストに `Cross-Origin-Resource-Policy: same-site` レスポンスヘッダを設定しても問題ないはずです。[CORP]({{< ref "../opt-in/corp.md" >}})を参照してください。
 
 ## デプロイメント
 
