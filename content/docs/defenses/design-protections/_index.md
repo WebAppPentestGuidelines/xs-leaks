@@ -3,9 +3,9 @@ title: "Application Design"
 weight: -1
 ---
 
-# Application Design
+# アプリケーション設計
 
-This section contains articles explaining how you can:
+このセクションには、以下について解説する記事を掲載しています。
 
-* Defend against cache probing attacks, see [Cache Protections]({{< ref "./cache-protections.md" >}}). 
-* Protect especially sensitive endpoints, see [Subresource Protections]({{< ref "./subresource-protections.md" >}}).
+* cache probing攻撃に対する対策はこちらを参照してください [Cache Protections]({{< ref "./cache-protections.md" >}})。
+* 機密性の高いエンドポイントの保護についてはこちらを参照してください [Subresource Protections]({{< ref "./subresource-protections.md" >}})。

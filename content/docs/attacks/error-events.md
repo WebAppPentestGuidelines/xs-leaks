@@ -20,16 +20,22 @@ weight = 2
 +++
 
 
-When a webpage issues a request to a server (e.g. fetch, HTML tags), the server receives and processes this request. When received, the server decides whether the request should succeed (e.g. 200) or fail (e.g. 404) based on the provided context. When a response has an error status, an [error event](https://developer.mozilla.org/en-US/docs/Web/API/Element/error_event) is fired by the browser for the page to handle. These errors also cover situations where the parser fails, for example when trying to embed `HTML` content as an image.
+Webページがサーバにリクエストを発行すると（例：フェッチ、HTMLタグ）、サーバはこのリクエストを受信して処理します。
+受信した際にサーバは与えられた条件に基づいて、リクエストが成功（例：200）すべきか失敗（例：404）すべきかを決定します。
+レスポンスがエラーステータスを持つ場合、ページを処理するためにブラウザによって[error event](https://developer.mozilla.org/en-US/docs/Web/API/Element/error_event)が発行されます。
+これらのエラーは、例えば`HTML`コンテンツを画像として埋め込もうとした時のようなパーサーの処理が失敗するケースにも対応しています。
 
-For example, attackers can detect whether a user is logged in to a service by checking if the user has access to resources only available to authenticated users [^3]. The impact of this XS-Leak varies depending on the application, but it can lead to sophisticated attacks with the ability to deanonymize users [^1].
+たとえば、攻撃者は認証されたユーザだけが利用できるリソースにユーザがアクセスできるかどうかを確認することで、ユーザがサービスにログインしているかどうかを検出できます[^3]。
+このXS-Leakの影響はアプリケーションによって異なりますが、ユーザを非匿名化する高度な攻撃につながる可能性があります[^1]。
 
-Error events can be thrown from a large variety of HTML tags, and some behaviors vary from browser to browser [^4]. For instance, the behavior can depend on the loaded resources, HTML tags, presence of certain headers (e.g. `nosniff`, `Content-Type`), or the enforcement of default browser protections, etc.
+エラーイベントは様々な HTMLタグからスローされる可能性があり、ブラウザによって動作が異なるものもあります [^4]。
+例えば、読み込まれたリソースやHTMLタグ、特定のヘッダ（例えば `nosniff` や `Content-Type` ）の存在、あるいはブラウザのデフォルトの保護機能の適用などによって動作が変わることがあります。
 
-The principle of leaking information with error events can be abstracted and applied to a variety of XS-Leaks. For example, one technique for [Cache Probing]({{< ref "cache-probing.md" >}}) uses Error Events to detect if a certain image was cached by the browser.
+エラーイベントで情報をリークさせる原理は、さまざまなXS-Leakに抽象化して適用できます。 
+たとえば、[Cache Probing]({{< ref "cache-probing.md" >}})の1つの手法では、特定の画像がブラウザによってキャッシュされたかどうかの検出にエラーイベントを使用しています。
 
-## Code Snippet
-The below snippet demonstrates how an Error Event can be detected with the `<script>` tag:
+## コード
+以下のコードは、`<script>` タグを使用してエラーイベントを検出する方法を示しています。
 
 ```javascript
 function probeError(url) {
@@ -39,18 +45,19 @@ function probeError(url) {
   script.onerror = () => console.log('Error event triggered');
   document.head.appendChild(script);
 }
-// because google.com/404 returns HTTP 404, the script triggers error event
+// google.com/404 が HTTP 404 を返すため、スクリプトはエラーイベントを発生する
 probeError('https://google.com/404');
 
-// because google.com returns HTTP 200, the script triggers onload event
+// google.com は HTTP 200 を返すので、スクリプトは onloadイベントをトリガーする
 probeError('https://google.com/');
 ```
 
-## Defense
+## 対策
 
-The mitigation of this XS-Leak often varies depending on how applications handle certain resources. The general approach is to adopt consistent behaviors whereever possible. In specific scenarios, applications might use [Subresource Protections]({{< ref "/docs/defenses/design-protections/subresource-protections.md" >}}) to prevent attackers from predicting a URL and going forward with an attack.
-
-Finally, without applying bigger changes in the logic of applications, generic web platform security features can be deployed to mitigate this XS-Leak at a larger scale.
+このXS-Leakの緩和策は、アプリケーションが特定のリソースをどのように処理するかによって異なる可能性があります。
+一般的なアプローチとしては、可能な限り一貫した挙動を採用することです。
+特定のシナリオでは、アプリケーションは[Subresource Protections]({{< ref "/docs/defenses/design-protections/subresource-protections.md" >}})を使用して、攻撃者がURLを予測して攻撃を進行させることを防ぐことができます。
+最後に、一般的なWebプラットフォームのセキュリティ機能を導入することで、アプリケーションの実装に大きな変更を加えることなく、このXS-Leakをより大幅に緩和することができます。
 
 | [SameSite Cookies (Lax)]({{< ref "/docs/defenses/opt-in/same-site-cookies.md" >}}) | [COOP]({{< ref "/docs/defenses/opt-in/coop.md" >}}) | [Framing Protections]({{< ref "/docs/defenses/opt-in/xfo.md" >}}) |                  [Isolation Policies]({{< ref "/docs/defenses/isolation-policies" >}})                   |
 | :--------------------------------------------------------------------------------: | :-------------------------------------------------: | :---------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------: |
@@ -58,13 +65,16 @@ Finally, without applying bigger changes in the logic of applications, generic w
 
 ____
 
-1. The resource isolation policy should be enough to prevent error-based cross-site leaks, although in some scenarios without the [Framing Isolation Policy]({{< ref "/docs/defenses/isolation-policies/framing-isolation" >}}), the error events could be leaked through iframes.
+1. resource isolation policyはエラーベースのcross-site leaksを防ぐのに十分な有効なはずですが、[Framing Isolation Policy]({{< ref "/docs/defenses/isolation-policies/framing-isolation" >}})がないシナリオでは、iframeを通してエラーイベントが漏洩する可能性があります。
 
-## Real World Example
+## 実例
 
-A bug allowed abusing a Twitter API endpoint to which only a specified user would have access. This endpoint would return an error to every Twitter user except the owner. An attacker could exploit this behavior to deanonymize a user [^3]. Similarly, another bug allowed abusing an image authentication mechanism of private messages to achieve the same goal  [^2] [^1].
+特定のユーザしかアクセスできないTwitter APIのエンドポイントを悪用できるバグがありました。
+このエンドポイントは、所有者以外のすべてのTwitterユーザに対してエラーを返します。
+攻撃者はこの挙動を悪用して、ユーザを非匿名化させる可能性があります。
+同様に、別のバグではプライベートメッセージの画像認証機構を悪用して、同じ目的を達成することができました[^2] [^1]。
 
-## References
+## 参考文献
 
 [^1]: Leaky Images: Targeted Privacy Attacks in the Web, [link](https://www.usenix.org/system/files/sec19fall_staicu_prepub.pdf)
 [^2]: Tracking of users on third-party websites using the Twitter cookie, due to a flaw in authenticating image requests, [link](https://hackerone.com/reports/329957)

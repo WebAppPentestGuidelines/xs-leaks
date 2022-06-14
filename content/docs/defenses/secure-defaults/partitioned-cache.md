@@ -8,27 +8,36 @@ category = [
 menu = "main"
 +++
 
-In order to defend against cache probing attacks, browser developers are actively working on implementing a partitioned HTTP cache functionality that would in essence ensure each website has a distinct cache. Since cache probing relies on the fact that a browser's HTTP cache is shared across every website, a partitioned HTTP cache can defend against many cache probing techniques. This is done by using tuples (either `(top-frame-site, resource-url)` like firefox [^6] or `(top-frame-site, framing-site, resource-url)`) like chromium/chrome [^5] as the cache keys to ensure the cache is partitioned by the requesting site. This makes it more challenging for attackers to interact with the cached contents of different sites [^1] [^2] [^3]. Safari currently ships a partitioned cache [^4].
+cache probing攻撃を対策するために、ブラウザ開発者は、各Webサイトが個別のキャッシュを持つようにするパーティション化されたHTTPキャッシュ機能の実装に積極的に取り組んでいます。
+cache probingは、ブラウザのHTTPキャッシュがすべてのWebサイトで共有されるという事実に依存しているため、パーティション化されたHTTPキャッシュは、多くのcache probingの手法を対策できます。
+これは、キャッシュが要求元のサイトによってパーティショニングされていることを確認するためのキャッシュキーとして、firefox [^6]のようなタプル（`(top-frame-site, resource-url)` または chromium/chrome [^5] のような `(top-frame-site, framing-site, resource-url)` ）を使って行われます。
+これにより、攻撃者が異なるサイトのキャッシュされたコンテンツを操作することがより困難になります [^1] [^2] [^3]。
+Safariは現在、パーティション化されたキャッシュを搭載しています[^4]。
 
 {{< hint tip >}}
-For browsers that don't use partitioned caches, there are [other defenses]({{< ref "../design-protections/cache-protections.md" >}}) that applications can deploy to defend against cache probing techniques. Pages can also be [designed]({{< ref "../design-protections/subresource-protections.md" >}}) to require some level of user interaction in order to defend against cache probing attacks.
+パーティション化されたキャッシュを使用しないブラウザの場合、アプリケーションがcache probing技術を対策するために展開できる[other defenses]({{< ref "../design-protections/cache-protections.md" >}})があります。
+また、cache probing攻撃を対策するために、あるレベルのユーザインタラクションを必要とするように [designed]({{< ref "../design-protections/subresource-protections.md" >}}) することも可能です。
 {{< /hint >}}
 
-## Other Relevant Projects
+## その他の関連プロジェクト
 
-### WebKit Tracking Prevention Technologies
+### WebKitのトラッキング防止技術
 
-Safari implements a partitioned HTTP cache using `(top-frame-site, resource URL)` as the cache key. This is part of WebKit's larger [Tracking Prevention](https://webkit.org/tracking-prevention/) project.
+Safari は `(top-frame-site, resource URL)` をキャッシュキーとして使用するパーティション化された HTTP キャッシュを実装しています。
+これは、WebKit のより大きな [Tracking Prevention](https://webkit.org/tracking-prevention/) プロジェクトの一部です。
 
-### Firefox First Party Isolation
+### FirefoxのFirst Party Isolation
 
-First Party Isolation is a [browser extension](https://addons.mozilla.org/en-US/firefox/addon/first-party-isolation/) for Firefox which restricts access to cookies and persistent data (e.g. cache) per domain. This requires an opt-in on the part of the user.
+First Party Isolationは、Firefoxの [browser extension](https://addons.mozilla.org/en-US/firefox/addon/first-party-isolation/) で、ドメインごとにクッキーや永続的なデータ（キャッシュなど）へのアクセスを制限するものです。
+これには、ユーザ側でのオプトインが必要です。
 
-## Considerations
+## 考察
 
-Partitioned HTTP caches are a promising security feature that will eventually land in all browsers. These partitioning strategies will mitigate most of the XS-Leak techniques that leverage browser caches. In the future, partitioned caches might be extended to other browser resources, which could help mitigate other XS-Leak techniques like the [Socket Exhaustion XS-Leak]({{< ref "../../attacks/timing-attacks/connection-pool.md" >}}).
+パーティション化されたHTTPキャッシュは、いずれすべてのブラウザに搭載されるであろう有望なセキュリティ機能です。
+これらのパーティショニング戦略は、ブラウザのキャッシュを活用するXS-Leakの手法のほとんどを軽減します。
+将来的には、パーティション化されたキャッシュは他のブラウザリソースに拡張され、[Socket Exhaustion XS-Leak]({{< ref "../../attacks/timing-attacks/connection-pool.md" >}}) などの他のXS-Leak手法の対策にも役立つかもしれません。
 
-## References
+## 参考文献
 
 [^1]: Double-keyed HTTP cache, [link](https://github.com/whatwg/fetch/issues/904)
 [^2]: Explainer - Partition the HTTP Cache, [link](https://github.com/shivanigithub/http-cache-partitioning)

