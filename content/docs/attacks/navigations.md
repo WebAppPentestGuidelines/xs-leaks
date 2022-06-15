@@ -1,5 +1,5 @@
 +++
-title = "画面遷移"
+title = "Navigations"
 description = ""
 date = "2020-10-01"
 category = [
@@ -41,13 +41,13 @@ Chromeベースのブラウザではファイルをダウンロードする際�
 
 
 ```javascript
-// Read the current height of the window
+// ウィンドウの現在の高さを読み取る
 var screenHeight = window.innerHeight;
-// Load the page that may or may not trigger the download
+// ダウンロードのトリガーとなるページを読み込む
 window.open('https://example.org');
-// Wait for the tab to load
+// タブの読み込みを待つ
 setTimeout(() => {
-    // If the download bar appears, the height of all tabs will be smaller
+    // ダウンロードバーが表示された場合、すべてのタブの高さが小さくなります
     if (window.innerHeight < screenHeight) {
       console.log('Download bar detected');
     } else {
@@ -67,17 +67,16 @@ setTimeout(() => {
 以下のコードは、そのような遷移が発生したかを検出しダウンロードが試行されたかを検出します。
 
 ```javascript
-// Set the destination URL to test for the download attempt
+// ダウンロード試行時のテスト先URLを設定する
 var url = 'https://example.org/';
-// Create an outer iframe to measure onload event
+// onloadイベントを計測するための外側のiframeを作成する
 var iframe = document.createElement('iframe');
 document.body.appendChild(iframe);
-// Create an inner iframe to test for the download attempt
+// ダウンロードの試行をテストするために、内側のiframeを作成
 iframe.srcdoc = `<iframe src="${url}" ></iframe>`;
 iframe.onload = () => {
       try {
-          // If a navigation occurs, the iframe will be cross-origin,
-          // so accessing "inner.origin" will throw an exception
+          // ナビゲーションが発生した場合、iframeはクロスオリジンになるため、"inner.origin "にアクセスすると例外が発生します。
           iframe.contentWindow.frames[0].origin;
           console.log('Download attempt detected');
       } catch(e) {
@@ -99,16 +98,15 @@ iframe.onload = () => {
 前項で紹介した手法は`window`オブジェクトを利用しても効果的にテストすることができます。
 
 ```javascript
-// Set the destination URL
+// 送信先URLをセット
 var url = 'https://example.org';
-// Get a window reference
+// window参照を取得
 var win = window.open(url);
 
-// Wait for the window to load.
+// windowが読み込まれるまで待機
 setTimeout(() => {
       try {
-          // If a navigation occurs, the iframe will be cross-origin,
-          // so accessing "win.origin" will throw an exception
+          //  ナビゲーションが発生した場合、iframeはクロスオリジンになるため、"win.origin" にアクセスすると例外が発生する
           win.origin;
           parent.console.log('Download attempt detected');
       } catch(e) {
@@ -119,7 +117,7 @@ setTimeout(() => {
 
 ## サーバサイドリダイレクト
 
-### インフレ
+### 拡張
 
 サーバサイドリダイレクトは、宛先URLのサイズと攻撃者によって制御されている入力値（クエリ文字列またはパスのいずれか）が増加する場合、クロスオリジンのページから検出することができます。以下の手法は大きなクエリ文字列やパスを生成する子男でほとんどのWEBサーバでエラーを誘発することが可能であるという事実に依存しています。リダイレクトはURLのサイズを増加させるため、サーバが処理可能なURLの最大長より正確に1文字減らすることで検出することができます。これによりサイズが大きくなった場合、サーバはクロスオリジンのページから検出可能なエラーを応答します。（例えばエラーイベント経由）
 
@@ -158,17 +156,16 @@ fetch('https://example.org/might_redirect', {
 以下の例では、フォームのアクション（3行目）が`https://example.org`以外にリダイレクトされると`SecurityPolicyViolationEvent`がトリガーされます。
 
 {{< highlight html "linenos=table,linenostart=1" >}}
-<!-- Set the Content-Security-Policy to only allow example.org -->
+<!-- Content-Security-Policyをexample.orgのみ許可するように設定する -->
 <meta http-equiv="Content-Security-Policy"
       content="form-action https://example.org">
 <form action="https://example.org/might_redirect"></form>
 <script>
-// Listen for a CSP violation event
+// CSP違反イベントをリッスンする
 document.addEventListener('securitypolicyviolation', () => {
   console.log("Detected a redirect to somewhere other than example.org");
 });
-// Try to get example.org via a form. If it redirects to another cross-site website
-// it will trigger a CSP violation event
+// フォームからexample.orgを取得してみてください。別のクロスサイトなウェブサイトにリダイレクトされると、CSP違反のイベントが発生する
 document.forms[0].submit();
 </script>
 {{< / highlight >}}
@@ -191,19 +188,19 @@ async function ifCached_window(url) {
   return new Promise(resolve => {
     checker.location = url;
 
-    // Cache only
+    // キャッシュのみ
     setTimeout(() => {
       checker.stop();
     }, 20);
 
-    // Get result
+    // 結果を取得
     setTimeout(() => {
       try {
         let origin = checker.origin;
-        // Origin has not changed before timeout.
+        // タイムアウト前にOriginが変更されていない
         resolve(false);
       } catch {
-        // Origin has changed.
+        // Originが変更された
         resolve(true);
         checker.location = "about:blank";
       }
@@ -211,19 +208,19 @@ async function ifCached_window(url) {
   });
 }
 ```
-Create window (makes it possible to go back after a successful check)
+windowを作成（チェック成功後に戻ることが可能になる）
 ```javascript
 let checker = window.open("about:blank");
 ```
-Usage
+使い方
 ```javascript
 await ifCached_window("https://example.org");
 ```
 {{< hint info >}}
-Partitioned HTTP Cache Bypass can be prevented using the header `Vary: Sec-Fetch-Site` as that splits the cache by its initiator, see [Cache Protections]({{< ref "/docs/defenses/design-protections/cache-protections.md" >}}). It works because the attack only applies for the resources from the same site, hence `Sec-Fetch-Site` header will be `cross-site` for the attacker compared to `same-site` or `same-origin` for the website.
+パーティション化されたHTTPキャッシュを回避するにはヘッダ `Vary.Sec-Fetch-Site` を使って防ぐことができます。`Sec-Fetch-Site` はキャッシュを開始者によって分割するため、[Cache Protections]({{< ref "/docs/defenses/design-protections/cache-protections.md" >}}) を参照してください。この攻撃は同じサイトのリソースにのみ適用されるため、`Sec-Fetch-Site`ヘッダーはウェブサイトの `same-site` や `same-origin` に対して、攻撃者にとっては `cross-site` になるため、うまくいきます。
 {{< /hint >}}
 
-## Defense
+## 対策
 
 |       Attack Alternative        | [SameSite Cookies (Lax)]({{< ref "/docs/defenses/opt-in/same-site-cookies.md" >}}) | [COOP]({{< ref "/docs/defenses/opt-in/coop.md" >}}) | [Framing Protections]({{< ref "/docs/defenses/opt-in/xfo.md" >}}) |                                          [Isolation Policies]({{< ref "/docs/defenses/isolation-policies" >}})                                          |
 | :-----------------------------: | :--------------------------------------------------------------------------------: | :-------------------------------------------------: | :---------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------: |
@@ -239,12 +236,12 @@ Partitioned HTTP Cache Bypass can be prevented using the header `Vary: Sec-Fetch
 🔗 – Defense mechanisms must be combined to be effective against different scenarios.
 
 ____
-1. Neither [COOP]({{< ref "/docs/defenses/opt-in/coop.md" >}}) nor [Framing Protections]({{< ref "/docs/defenses/opt-in/xfo.md" >}}) helps with the mitigation of the redirect leaks because when the header `Content-Disposition` is present, other headers are being ignored.
-2. SameSite cookies in Lax mode could protect against iframing a website, but won't help with the leaks through window references or involving server-side redirects, in contrast to Strict mode.
+1. [COOP]({{< ref "/docs/defenses/opt-in/coop.md" >}}) と [Framing Protections]({{< ref "/docs/defenses/opt-in/xfo.md" >}}) のどちらも、 `Content-Disposition` ヘッダが存在すると他のヘッダが無視されてしまい、リダイレクトリークを緩和することはできません。
+2. LaxモードのSameSite Cookieは、ウェブサイトのiframingから保護することができますが、Strictモードとは対照的に、ウィンドウ参照やサーバー側のリダイレクトを含むリークには役立ちません。
 
 ## Real-World Examples
 
-A vulnerability reported to Twitter used this technique to leak the contents of private tweets using [XS-Search]({{< ref "../attacks/xs-search.md" >}}). This attack was possible because the page would only trigger a navigation if there were results to the user query [^1].
+Twitterに報告された脆弱性は、この手法を利用して[XS-Search]({{< ref "../attacks/xs-search.md" >}})による非公開ツイートの内容を漏洩させるというものでした。この攻撃は、ユーザーのクエリ[^1]に対する結果がある場合にのみ、ページがナビゲーションを開始するため、可能でした。
 
 ## References
 

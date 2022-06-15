@@ -10,7 +10,7 @@ menu = "main"
 
 SameSite Cookieは、クロスサイトリクエストを含むセキュリティ問題を修正するための、最もインパクトのある最新のセキュリティ機構の一つです。この機構によって、アプリケーションはブラウザに、同じサイト [^1]で発行されたリクエストにのみCookieを含めるように強制することができます。SameSite Cookieには、`None`、`Lax`、`Strict` の 3 つのモードがあります。
 
-## SameSite Cookie Modes
+## SameSite Cookieのモード
 
 SameSite Cookieのモードは以下の通りです。
 
@@ -25,7 +25,7 @@ SameSite Cookieのモードは以下の通りです。
 
 * `Lax` – `Lax`と`Strict`の唯一の違いは、`Lax`モードではトップレベルの遷移によって発生するクロスサイトリクエストにはCookieを付けることができるということです。`Lax` モードはアプリケーションへの導線リンクを破壊しないため、設定がより簡単になります。残念ながら、攻撃者は`window.open` を通じてトップレベルの遷移を引き起こすことができ、それによって攻撃者は`window`オブジェクトへの参照を維持することができます。
 
-## Considerations
+## 考察
 
 `Strict`モードのCookieは最強のセキュリティ保護を提供しますが、既存のアプリケーションに`Strict`モードのSameSite Cookieを設定することは難しいでしょう。
 
@@ -38,11 +38,11 @@ Google Chromeのデフォルトでは、`SameSite`属性を持たないCookieは
 [^3]: Cookies default to SameSite=Lax, [link](https://www.chromestatus.com/feature/5088147346030592)
 {{< /hint >}}
 
-## Deployment
+## 実装
 
 この機構をWebアプリケーションに導入することに興味がある場合は [web.dev](https://web.dev/samesite-cookie-recipes/) の記事を見てください。
 
-## References
+## 参考資料
 
 [^1]: SameSite cookies explained, [link](https://web.dev/samesite-cookies-explained/)
 [^2]: Bypass SameSite Cookies Default to Lax and get CSRF, [link](https://medium.com/@renwa/bypass-samesite-cookies-default-to-lax-and-get-csrf-343ba09b9f2b)

@@ -22,7 +22,7 @@ title: "対策の仕組み"
 ブラウザのサポートに依存する緩和策を使用する場合、ユーザのブラウザで十分にサポートされていることを必ず確認してください。例えば `fetch metadata` ヘッダは素晴らしいツールですが現在はChromiumベースのブラウザだけでしかサポートされていません。異なる仕様に対するブラウザサポートの最新情報については、[MDN](https://developer.mozilla.org/en-US/)を確認してください。
 {{< /hint >}}
 
-## Application Design
+## アプリケーションの設計
 
 アプリケーションの設計[手法]({{< ref "design-protections/_index.md" >}})はXS-Leaksをアプリケーションの設計段階で防止する方法に重点を置いています。これは、より強力で全体的な保護をすぐに有効にすることが現実的でない場合に、非常に有用なアプローチです。もう一つの大きな利点は、最新のブラウザ仕様をサポートしていない古いブラウザでも、注意深くアプリケーションを設計することでXS-Leaksを阻止できることです。
 
@@ -37,6 +37,6 @@ title: "対策の仕組み"
 セキュアデフォルトは素晴らしいものです！開発者が更に努力することなくアプリケーションとユーザを保護することができます。しかし、XS-Leaksを完全に防ぐことはできないので注意してください。
 {{< /hint >}}
 
-## References
+## 参考文献
 
 [^1]: Google Bughunter University - XSLeaks and XS-Search, [link](https://sites.google.com/site/bughunteruniversity/nonvuln/xsleaks)

@@ -16,7 +16,7 @@ XS-Leaksのシナリオでは、サーバーはリクエストがいつクロス
 セキュリティ上の理由から、Fetch Metadataヘッダは暗号化されたリクエスト（HTTPS）にのみ付与されます。
 {{< /hint >}}
 
-## Fetch Metadata vs. SameSite cookies
+## Fetch Metadata vs. SameSite cookie
 
 Fetch Metadata ヘッダは、SameSite Cookieによって提供される保護を拡張するために使用することができます。Fetch Metadata ヘッダと SameSite Cookieの両方がクロスサイトリクエストを拒否するために使われることがありますが Fetch Metadata は以下のような要素に基づいて、より情報に基づいた決定をすることができます。
 * リクエストはSame Origin（同一生成元）か、Same Site（同一サイト）か
@@ -26,12 +26,12 @@ Fetch Metadata ヘッダは、SameSite Cookieによって提供される保護�
 
 これは、SameSite Cookieがサービスの機能を壊す可能性があるシナリオにおいて、より正確な保護の展開を可能にします。SameSite Cookieと比較した Fetch Metadata の欠点は、前者が暗号化されていないリクエスト(HTTP)も保護できるのに対し、後者がそうできないことです。
 
-## Considerations
+## 考察
 
 Fetch Metadataヘッダは徹底した防護戦略のための有用なツールですが、 [SameSite Cookies]({{< ref "same-site-cookies.md" >}}), [COOP]({{< ref "coop.md" >}}), あるいは [Framing Protections]({{< ref "xfo.md" >}}) といった仕組みの代わりとして見なされるものではありません。たとえFetch Metadataヘッダを使用して同様の結果を得ることができるとしても、サーバに加えてクライアント側でもこれらの制限を実施することが最善です。
 
 Fetch Metadataヘッダの有用性は、アプリケーションの対象範囲とデプロイの正しさに依存します。
 
-## Policies
+## ポリシー
 
-See [Resource Isolation Policy]({{< ref "../isolation-policies/resource-isolation.md" >}}) and [Framing Isolation Policy]({{< ref "../isolation-policies/framing-isolation.md" >}}) for specific policies utilizing Fetch Metadata Request Headers.
+Fetch Metadata Request Headers を利用した特定のポリシーについては [Resource Isolation Policy]({{< ref "../isolation-policies/resource-isolation.md" >}}) と [Framing Isolation Policy]({{< ref "../isolation-policies/framing-isolation.md" >}} を参照してください。
