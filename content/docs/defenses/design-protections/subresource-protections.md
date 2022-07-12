@@ -8,38 +8,48 @@ category = [
 menu = "main"
 +++
 
-The fundamental idea behind designing protections for subresources is that subresources cannot be targeted by XS-Leaks if the attacker cannot make them return any user data. If implemented correctly, this approach can be a very strong defense, though it is likely to be tough to implement and could negatively impact the user experience.
+サブリソースを保護する設計の基本的な考え方は、攻撃者がサブリソースにユーザデータを返させることができなければ、サブリソースはXS-Leakの対象とはならないということです。
+正しく実装されている場合、このアプローチは非常に強力な対策となりますが、実装が難しく、ユーザ体験に悪影響を与える可能性があります。
 
 {{< hint tip >}}
-It can be very effective to deploy this approach on any specific resources that are known to be especially sensitive to XS-Leaks. But, due to the challenges of deploying this protection universally, applications are encouraged to deploy [opt-in web platform security features]({{< ref "../_index.md" >}}) as the default approach.
+XS-Leakに特に注意すべきと認識している特定のリソースに、このアプローチを展開することは非常に効果的です。
+ただし、この保護を一般的に展開するのは難しいため、アプリケーションはデフォルトのアプローチとして [opt-in web platform security features]({{< ref "../_index.md" >}})を展開することを推奨します。
 {{< /hint >}}
 
-## Token-Based Protections
+## トークンベースの保護
 
-A strong protection for subresources can be achieved by including a user-specific token in every request. This protects against most XS-Leak techniques if implemented correctly. The idea is that in order to verify a request for a resource as being legitimate, a token must be included. This token must be provided to the client in a way that prevents an attacker from including it in their own requests.
+サブリソースの強力な保護は、すべてのリクエストにユーザ固有のトークンを含めることで実現できます。
+これは、正しく実装されていれば、ほとんどのXS-Leakの手法から保護されます。
+リソースのリクエストが正当であると検証するために、トークンを含めなければならないという考え方です。
+なお、このトークンは攻撃者が自分のリクエストに含めることができないように、クライアントに提供しなければなりません。
 
 {{< hint example >}}
-Suppose there is a search bar in an application.
+アプリケーションに検索バーがあるとします。
 
-1. When the user loads the main page, the server includes a secure token somewhere in the body of the page.
-2. When the user searches for something, a request is made to `/search?query=<QUERY>&token=<SECURE_TOKEN>`.
-3. The backend verifies that the provided token is valid for the current user.
-4. If it is not valid, the request is rejected.
+1. ユーザがメインページを読み込むと、サーバはページの本文のどこかに安全なトークンを含めます。
+2. ユーザが何かを検索すると、`/search?query=<QUERY>&token=<SECURE_TOKEN>`にリクエストが送信されます。
+3. バックエンドにて、受け取ったトークンが現在のユーザに対して有効であることを確認します。
+4. 有効でない場合には、リクエストが拒否されます。
 
-In this scenario, there is no way for an attacker to trigger any requests to the endpoint because they cannot obtain a valid token for a given user. Note that this relies on it not being possible for an attacker to obtain or forge a token for other users. If they can do so, this approach is not effective.
+このシナリオでは、攻撃者は、特定のユーザにおいて有効なトークンを取得できないため、エンドポイント対してリクエストを送信させる方法がありません。
+これは、攻撃者が他のユーザのトークンを取得または偽造できないことに、依存することに注意してください。
+もしそれが可能であれば、このアプローチは有効ではありません。
 {{< /hint >}}
 
-This style of protection can be applied to:
+このスタイルの保護は、次の用途に適用できます。
 
-- Authenticated subresources such as API endpoints or regular authenticated URLs. While tokens can be used in this case, security mitigations like [Same-Site Cookies]({{< ref "../opt-in/same-site-cookies.md" >}}) may be easier to deploy at scale.
-- Unauthenticated subresources such as images can use this protection to prevent some types of [Cache Probing Attacks]({{< ref "../../attacks/cache-probing.md" >}}). While this does work, see [Cache Protections]({{< ref "./cache-protections.md" >}}) for other strategies to defend against cache probing attacks.
+- APIエンドポイントや一般的な認証されたURLなどの認証済みのサブリソース。この場合、トークンも利用できますが、[Same-Site Cookies]({{< ref "../opt-in/same-site-cookies.md" >}}) などのセキュリティ緩和策の方が、大規模に展開しやすいかもしれません。
+- 画像などの認証されていないサブリソースは、一部のタイプの [Cache Probing Attacks]({{< ref "../../attacks/cache-probing.md" >}}) を対策するためにこの保護を利用できます。これは有効ですが、cache probing攻撃を対策する他の戦略については [Cache Protections]({{< ref "./cache-protections.md" >}}) を参照してください。
 
 {{< hint warning >}}
-Implementing token-based protections might break the ability of users to save or share links (e.g. bookmarks).
+トークンベースの保護を実装すると、ユーザがリンク（ブックマークなど）を保存したり共有する機能が損なわれる可能性があります。
 {{< /hint >}}
 
-## User Consent
+## ユーザの同意
 
-Another strong defense is to require user interaction before returning any sensitive data. This ensures that sensitive endpoints cannot be included via `script` or `img` tags. For example, Facebook requires user confirmation before viewing search results or private messages. Since attackers cannot simulate this user interaction, they are unable to leak the contents of the search results.
+もう1つの強力な対策は、機密データを返す前にユーザの操作を要求することです。
+これにより、機密性の高いエンドポイントは、`script`または`img`タグを介して含めることができなくなります。
+たとえば、Facebookでは、検索結果やプライベートメッセージを表示する前にユーザの確認が必要です。
+攻撃者はこのユーザとの対話を再現できないため、検索結果の内容をリークさせることはできません。
 
-This can be a very useful way of protecting especially sensitive endpoints, but note once again that this is likely to be time-consuming to implement.
+これは、特に機密性の高いエンドポイントを保護するために非常に有効な方法ですが、実装に時間がかかる可能性があることに注意してください。

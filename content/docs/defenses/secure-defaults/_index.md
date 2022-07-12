@@ -3,9 +3,9 @@ title = "Secure Defaults"
 weight = 10
 +++
 
-# Secure Defaults
+# 安全なデフォルト
 
-This section contains articles discussing two types of secure defaults:
+このセクションには、2種類の安全なデフォルトについて説明している記事を掲載しています。
 
-* [Partitioned Caches]({{< ref "./partitioned-cache.md" >}}) – Ensure that cache resources cannot be shared in between different sites.
-* [Cross Origin Read Blocking (CORB)]({{< ref "./corb.md" >}}) – Prevents certain types of responses from being referenced by certain classes of requests.
+* [Partitioned Caches]({{< ref "./partitioned-cache.md" >}}) – キャッシュリソースを異なるサイト間で共有できないようにします。
+* [Cross Origin Read Blocking (CORB)]({{< ref "./corb.md" >}}) – 特定の種類のレスポンスが特定のクラスのリクエストによって参照されるのを防ぎます。

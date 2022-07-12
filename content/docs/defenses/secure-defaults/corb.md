@@ -6,21 +6,24 @@ category = "Defense"
 menu = "main"
 +++
 
-Cross-Origin Read Blocking (CORB) is a security mechanism that prevents attackers from loading certain cross-origin resources [^1]. This protection was created to defend against speculative side-channel attacks such as Spectre that allow attackers to read the memory of the process that both cross-site pages (e.g. *attacker.com* and *sensitive.com*) were embedded into. CORB aims to prevent attackers from loading certain sensitive cross-origin resources into an attacker-controlled process. For example, if an attacker tries to load cross-origin HTML, XML, or JSON into an `img` tag, CORB prevents this from happening. With CORB, the scenario is treated as though the server returned no data.
+Cross-Origin Read Blocking (CORB)は、攻撃者が特定のクロスオリジンのリソースを読み込むことを防ぐセキュリティ機構です[^1]。
+この保護機構は、攻撃者がクロスサイトのページ（*attacker.com* と *sensitive.com* など）が埋め込まれたプロセスのメモリを読み取れるようにするSpectreなどの投機的なサイドチャネル攻撃から保護するために作成されました。
+CORBは、攻撃者が特定の機密性の高いクロスオリジンのリソースを攻撃者が制御するプロセスに読み込むのを防ぐことを目的としています。
+たとえば、攻撃者がクロスオリジンのHTML、XML、JSONを `img`タグに読み込もうとしようとすると、CORBはこれを阻止します。
+CORBを使用すると、サーバがデータを返さなかったかのように処理されます。
 
-To classify resources, CORB uses the `Content-Type` header, the `nosniff` header, and a variety of other heuristics.
+リソースを分類するために、CORBは `Content-Type`ヘッダ、` nosniff`ヘッダ、およびその他のさまざまなヒューリスティックを使用します。
 
 {{< hint info >}}
-[Cross-Origin Resource Policy (CORP)]({{< ref "../opt-in/corp.md" >}}) is an opt-in protection which enforces and extends CORB.
+[Cross-Origin Resource Policy (CORP)]({{< ref "../opt-in/corp.md" >}})は、CORB を適用・拡張するオプトインの保護です。
 {{< /hint >}}
 
-When using CORB, be aware of the following facts:
+CORBを使用するときは、以下の点に注意してください。
 
-* Currently, only Chromium-based browsers support CORB.
-* CORB does not protect against navigational requests. This means that in browsers that do not support out-of-process iframes, a CORB-protected resource may still end up in another origin's process if [framing protections]({{< ref "../opt-in/xfo.md" >}}) are not used.
-* CORB introduces a [new XS-Leak]({{< ref "../../attacks/browser-features/corb.md" >}}) technique since attackers may be able to observe the results of CORB. This can lead to a variety of information leaks. However, in most cases, these information leaks have a lower impact than the data that could be leaked via speculative execution attacks.
+* 現在はChromiumベースのブラウザのみがCORBをサポートしています。
+* CORBは、ナビゲーショナルリクエストに対して保護しません。つまり、プロセス外のiframeをサポートしないブラウザでは、[framing protections]({{< ref "../opt-in/xfo.md" >}})が使用されていない場合、CORBで保護されたリソースは別のオリジンのプロセスで終了する可能性があります。
+* CORBは、攻撃者がCORBの結果を観察できる可能性があるため、[new XS-Leak]({{< ref "../../attacks/browser-features/corb.md" >}}) 手法を引き入れており、これによってさまざまな情報のリークが発生する可能性があります。 ただし、ほとんどの場合、これらのリークは投機的実行攻撃によってリークされる可能性のあるデータよりも影響は小さいものでしょう。
 
-
-## References
+## 参考文献
 
 [^1]: Cross-Origin Read Blocking for Web Developers, [link](https://chromium.googlesource.com/chromium/src/+/master/services/network/cross_origin_read_blocking_explainer.md)

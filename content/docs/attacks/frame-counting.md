@@ -18,65 +18,73 @@ menu = "main"
 weight = 2
 +++
 
+ウィンドウの参照により、クロスオリジンのページが他のページのいくつかの属性にアクセスできます。
+これらの参照は、`iframe`と`window.open`を使用または許可するときに利用可能となります。
+この参照は、同一生成元ポリシーを尊重し続けるため、ウィンドウに関する（限定的な）情報を提供します。
 
-Window references allow cross-origin pages to get access to some of the attributes of other pages. These references become available when using or allowing `iframe` and `window.open`. The references provide (limited) information about the window as they still respect the same-origin policy.
+アクセス可能な属性の1つは、ウィンドウ内のフレーム数を提供する`window.length`です。
+この属性は、ページに関する貴重な情報を攻撃者に提供します。
 
-One of the accessible attributes is `window.length` which provides the number of frames in the window. This attribute can provide valuable information about a page to an attacker.
+Webサイトでは一般的にフレーム（または`iframes`）を使用しますが、この選択は必ずしもセキュリティ上の問題を意味するわけではありません。
+しかし、Webサイトがユーザの情報に応じてページのフレーム数を変更する場合があります。
+例えば、`GET`パラメータと利用者のデータに応じてレイアウトを変えるようなページで起こりえます。
+攻撃者は、異なるページで `window.length` の値を測定することにより、被害者に関する情報を推測することが可能かもしれません。
 
-Websites commonly use frames (or `iframes`) and this choice doesn't necessarily imply security issues. There are, however, cases where a website might change the number of frames on a page depending on some user information. For example, this could happen on a page that changes its layout depending on the `GET` parameters and the victim's data. It might be possible for an attacker to infer information about the victim by measuring the value of `window.length` on different pages.
+## コード
 
-## Code Snippet
-The below snippet demonstrates how to access the information about the number of frames on a cross-site page:
+以下のコードは、クロスサイトのページにおけるフレーム数に関する情報にアクセスする方法を示しています。
+
 ```javascript
-// Get a reference to the window
+// ウィンドウへの参照を取得する
 var win = window.open('https://example.org');
 
-// Wait for the page to load
+// ページが読み込まれるのを待つ
 setTimeout(() => {
-  // Read the number of iframes loaded
+  // 読み込まれたiframeの数を読み取る
   console.log("%d iframes detected", win.length);
 }, 2000);
 ```
 
-## Attack Alternatives
+## 攻撃の対策
 
-In some cases, different application states have the same number of `frames`, preventing attackers from being able to distinguish them. However, continuously recording the frame count while the page is loading may show a pattern that might leak information to an attacker:
+場合によっては、異なるアプリケーション状態が同じ数のフレームを持つことで、攻撃者がそれらを区別できないようにすることができます。
+ただし、ページの読み込み中にフレーム数を連続的に記録することで、攻撃者に情報をリークする可能性があるパターンを示す可能性もあります。
 
 ```javascript
-// Get a reference to the window
+// ウィンドウへの参照を取得する
 var win = window.open("https://example.org");
 var pattern = [];
 
-// In a loop, register the number of iframes at 60ms interval
+// ループ内で、60ms間隔でiframeの数を登録する
 var recorder = setInterval(() => {
   pattern.push(win.length)
 }, 60);
 
-// Break the loop after 6 seconds
+// 6秒後にループを解除する
 setTimeout(() => {
    clearInterval(recorder);
    console.log("The pattern is: %s", pattern.join(', '));
 }, 6 * 1000);
 ```
 
-## Case Scenarios
+## 事例
 
-Some examples of frame counting attacks are:
+フレームカウント攻撃の例としては、以下のようなものがあります。
 
-- A website lets a user search for user information in a search engine. If the page structure has a different number of `iframes` depending on whether there are results to the user query, an attacker could use the [XS-Search]({{< ref "xs-search.md" >}}) technique to leak those secrets.
-- A website structures the user profile page differently based on gender or other PII. An attacker can easily leak this information by opening the page and counting frames.
+- あるWebサイトでは、ユーザが検索エンジンでユーザ情報を検索することができます。もしユーザの検索に対する結果があるかどうかによって、ページ構造の`iframe`の数が異なる場合に、攻撃者は[XS-Search]({{< ref "xs-search.md" >}})の技術を利用して、秘密をリークさせることができるでしょう。
+- あるWebサイトでは、性別やその他の個人情報に基づいてユーザプロファイルページの構造が異なります。攻撃者は、ページを開いてフレームをカウントすることで、情報を簡単にリークさせることができるでしょう。
 
-## Defense
+## 対策
 
 | Attack Alternative | [SameSite Cookies (Lax)]({{< ref "/docs/defenses/opt-in/same-site-cookies.md" >}}) | [COOP]({{< ref "/docs/defenses/opt-in/coop.md" >}}) | [Framing Protections]({{< ref "/docs/defenses/opt-in/xfo.md" >}}) |    [Isolation Policies]({{< ref "/docs/defenses/isolation-policies" >}})    |
 | :----------------: | :--------------------------------------------------------------------------------: | :-------------------------------------------------: | :---------------------------------------------------------------: | :-------------------------------------------------------------------------: |
 |      iframes       |                                         ✔️                                          |                          ❌                          |                                 ✔️                                 |  [FIP]({{< ref "/docs/defenses/isolation-policies/framing-isolation" >}})   |
 |      windows       |                                         ❌                                          |                          ✔️                          |                                 ❌                                 | [NIP]({{< ref "/docs/defenses/isolation-policies/navigation-isolation" >}}) |
 
-## Real World Example
+## 実例
 
-A vulnerability reported to Facebook used this technique to leak user-related information such as specific content published in posts, religious information about friends, or photo locations[^1].
+Facebookに報告された脆弱性では、この手法を利用することで、投稿に掲載された特定の内容、友人の宗教情報、写真の位置情報などのユーザに関する情報をリークするというものでした[^1]。
 
-## References
+## 参考文献
 
 [^1]: Patched Facebook Vulnerability Could Have Exposed Private Information About You and Your Friends. [link](https://www.imperva.com/blog/facebook-privacy-bug/)
