@@ -15,20 +15,20 @@ menu = "main"
 weight = 3
 +++
 
-�A�v���P�[�V�����́A���̃I���W���Ə������L���邽�߂ɁA���΂���[postMessage broadcasts](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage)���g�p����B
-`postMessage` ���g���ƁA2��ނ� XS-Leaks �ɂȂ���\��������B
+アプリケーションは、他のオリジンと情報を共有するために、しばしば [postMessage broadcasts](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) を使用します。
+`postMessage` を使うと、2種類の XS-Leaks につながる可能性があります。
 
-* �M���ł��Ȃ����M���Ƌ@�����̍������b�Z�[�W�����L���邱��
-    * `postMessage` API �� `targetOrigin` �p�����[�^���T�|�[�g���Ă���A������g�p���ă��b�Z�[�W����M�ł���I���W���𐧌����邱�Ƃ��ł���B���b�Z�[�W�ɋ@�����̍����f�[�^���܂܂�Ă���ꍇ�A���̃p�����[�^���g�p���邱�Ƃ��d�v�ł���B 
+* 信頼できない発信元と機密性の高いメッセージを共有すること
+    * `postMessage` API は `targetOrigin` パラメータをサポートしており、これを使用してメッセージを受信できるオリジンを制限することができます。メッセージに機密性の高いデータが含まれている場合、このパラメータを使用することが重要です。 
 
-* �ω�����R���e���c��u���[�h�L���X�g�̑��݂Ɋ�Â������̃��[�N
-    * ����XS-Leak�̃e�N�j�b�N�Ɠ��l�ɁA����̓I���N�����`�����邽�߂Ɏg����\��������B�Ⴆ�΁A����A�v���P�[�V�������A�^����ꂽ���[�U���������[�U�����݂���ꍇ�ɂ̂݁A�uPage Loaded�v�Ƃ��� postMessage �u���[�h�L���X�g�𑗐M����ƁA����𗘗p���ď������[�N���邱�Ƃ��ł���B
+* 変化するコンテンツやブロードキャストの存在に基づいた情報のリーク
+    * 他の XS-Leak のテクニックと同様に、これはオラクルを形成するために使われる可能性があります。例えば、特定のユーザ名を持つユーザが存在する場合にのみ、アプリケーションが「Page Loaded」という postMessage ブロードキャストを送信すると、これを利用して情報をリークすることができます。
     
-## �΍�
+## 対策
 
-����XS-Leak�́ApostMessage�̃u���[�h�L���X�g���M�̖ړI�ɐ[���ˑ����邽�߁A���m�ȉ�����͑��݂��Ȃ��B
-�A�v���P�[�V�����́ApostMessage�̒ʐM�����m�̑��M���O���[�v�ɐ�������K�v������B
-���ꂪ�s�\�ȏꍇ�A�ʐM�̓��[�U�̏�ԂɊ֌W�Ȃ���т��ē�����������A�U���҂��ʐM�Ԃ̈Ⴂ�Ɋ�Â��ď��𐄘_����̂�h���ׂ��ł���B
+この XS-Leak は、postMessage のブロードキャスト送信の目的に深く依存するため、明確な解決策はありません。
+アプリケーションは、postMessage の通信を既知の送信元グループに制限する必要があります。
+これが不可能な場合、攻撃者が通信間の違いに基づいて情報を推論するのを防ぐために、ユーザの状態に関係なく通信が一貫して同じ動作をする必要があります。
 
 
 ## References
