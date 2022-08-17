@@ -29,7 +29,7 @@ weight = 2
 どのような画面遷移が発生したかを検出することで攻撃者以下の様なことが可能になります。
 
 - `iframe`を使用して`onload`イベントがトリガーされた回数を数える。
-- ウィンドウ参照を通じてアクセス可能な`history.length`の値をチェックする。この値は被害者の`history.pushState`や通常の画面遷移によって変更された履歴の数を提供しています。攻撃者は`history.length`の値を取得するためにウィンドウ参照のlocationをターゲットのウェブサイトに変更し、そしてSame-Originに戻すことによって最後に値を読み取ります。
+- ウィンドウへの参照を通じてアクセス可能な`history.length`の値をチェックする。この値は被害者の`history.pushState`や通常の画面遷移によって変更された履歴の数を提供しています。攻撃者は`history.length`の値を取得するためにウィンドウへの参照のlocationをターゲットのウェブサイトに変更し、そしてSame-Originに戻すことによって最後に値を読み取ります。
 
 ## ダウンロードトリガー
 
@@ -100,7 +100,7 @@ iframe.onload = () => {
 ```javascript
 // 送信先URLをセット
 var url = 'https://example.org';
-// window参照を取得
+// windowへの参照を取得
 var win = window.open(url);
 
 // windowが読み込まれるまで待機
@@ -178,10 +178,9 @@ FireFoxではChromeベースのブラウザとは異なり`form-action`がform�
 
 ## 分割されたHTTPキャッシュの回避
 
-If a site `example.com` includes a resource from `*.example.com/resource` then that resource will have the same caching key as if the resource was directly requested through top-level navigation. That is because the caching key is consisted of top-level *eTLD+1* and frame *eTLD+1*. [^cache-bypass]
+もし、サイト`example.com` が `*.example.com/resource` からのリソースを含む場合、sのリソースはトップレベルナビゲーションを通して直接リクエストされた場合と同じキャッシュキーを持つことになります。これは、キャッシュキーがトップレベルの *eTLD+1* と フレームの *eTLD+1* で構成されるからです。[^cache-bypass]
 
-Because a window can prevent a navigation to a different origin with `window.stop()` and the on-device cache is faster than the network,
-it can detect if a resource is cached by checking if the origin changed before the `stop()` could be run. 
+リソースがキャッシュされているかどうかは `window.stop()` が実行される前にオリジンが変更されたかどうかをチェックすることによって検出することができるのは、ウィンドウは`window.stop()` で異なるオリジンへのナビゲーションを防ぐことができ、デバイス上のキャッシュはネットワークより高速であるためです。
 
 ```javascript
 async function ifCached_window(url) {
@@ -217,7 +216,7 @@ let checker = window.open("about:blank");
 await ifCached_window("https://example.org");
 ```
 {{< hint info >}}
-パーティション化されたHTTPキャッシュを回避するにはヘッダ `Vary.Sec-Fetch-Site` を使って防ぐことができます。`Sec-Fetch-Site` はキャッシュを開始者によって分割するため、[Cache Protections]({{< ref "/docs/defenses/design-protections/cache-protections.md" >}}) を参照してください。この攻撃は同じサイトのリソースにのみ適用されるため、`Sec-Fetch-Site`ヘッダーはウェブサイトの `same-site` や `same-origin` に対して、攻撃者にとっては `cross-site` になるため、うまくいきます。
+分割されたHTTPキャッシュを回避するにはヘッダ `Vary.Sec-Fetch-Site` を使って防ぐことができます。`Sec-Fetch-Site` はキャッシュを開始者によって分割するため、[Cache Protections]({{< ref "/docs/defenses/design-protections/cache-protections.md" >}}) を参照してください。この攻撃は同じサイトのリソースにのみ適用されるため、`Sec-Fetch-Site`ヘッダーはウェブサイトの `same-site` や `same-origin` に対して、攻撃者にとっては `cross-site` になるため、うまくいきます。
 {{< /hint >}}
 
 ## 対策
@@ -237,7 +236,7 @@ await ifCached_window("https://example.org");
 
 ____
 1. [COOP]({{< ref "/docs/defenses/opt-in/coop.md" >}}) と [Framing Protections]({{< ref "/docs/defenses/opt-in/xfo.md" >}}) のどちらも、 `Content-Disposition` ヘッダが存在すると他のヘッダが無視されてしまい、リダイレクトリークを緩和することはできません。
-2. LaxモードのSameSite Cookieは、ウェブサイトのiframingから保護することができますが、Strictモードとは対照的に、ウィンドウ参照やサーバー側のリダイレクトを含むリークには役立ちません。
+2. LaxモードのSameSite Cookieは、ウェブサイトのiframingから保護することができますが、Strictモードとは対照的に、ウィンドウへの参照やサーバー側のリダイレクトを含むリークには役立ちません。
 
 ## Real-World Examples
 
