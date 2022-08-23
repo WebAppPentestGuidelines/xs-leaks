@@ -8,41 +8,40 @@ category = [
 menu = "main"
 weight = 1
 +++
-Resource Isolation Policy prevents external websites from requesting your resources. Blocking such traffic mitigates common web vulnerabilities such as CSRF, XSSI, or XS-Leaks. The policy can be enabled for applications whose endpoints are not intended to be loaded in a cross-site context and will allow resource requests coming from your application as well as direct navigations.
+Resource Isolation Policyは、外部のWebサイトがリソースを要求するのを防ぎます。このようなトラフィックをブロックすることで、CSRF、XSSI、XS-Leaks などの一般的な Web 脆弱性を軽減できます。このポリシーは、エンドポイントがクロスサイトコンテキストでロードされることを意図していないアプリケーションに対して有効にすることができ、アプリケーションから来るリソース要求だけでなく、直接の遷移も可能にします。
 
-## Implementation with Fetch Metadata
+## Fetch Metadataを用いた実装
 
-The below snippet showcases an example implemention of the Resource Isolation Policy with the use of [Fetch Metadata]({{< ref "../opt-in/fetch-metadata.md">}}) headers:
+以下のスニペットは、[Fetch Metadata]({{< ref "../opt-in/fetch-metadata.md">}}) ヘッダーを使用したResource Isolation Policyの実装例を示しています:
 
 ```py
-# Reject cross-origin requests to protect from , XSSI, XS-Leaks, and other bugs
+# クロスサイトリクエストを拒否し、クリックジャッキングやXS-Leaks、他のバグから保護します
 def allow_request(req):
-  # [OPTIONAL] Exempt paths/endpoints meant to be served cross-origin.
+  # [OPTIONAL] クロスオリジンで提供されることを意図したパス/エンドポイントを除外する。
   if req.path in ('/my_CORS_endpoint', '/favicon.png'):
     return True
 
-  # Safe to set `Cross-Origin-Resource-Policy: same-site`. (see Considerations)
+  # `Cross-Origin-Resource-Policy: same-site`を設定すると安全です。(考慮事項参照)
 
-  # Allow requests from browsers which don't send Fetch Metadata
+  # Fetch Metadataを送信しないブラウザからのリクエストを許可する
   if not req['headers']['sec-fetch-site']:
     return True
 
-  # Allow same-site and browser-initiated requests
+  # same-siteやブラウザ経由のリクエストの許可
   if req['headers']['sec-fetch-site'] in ('same-origin', 'same-site', 'none'):
     return True
 
-  # Allow simple top-level navigations, this includes embeds
+  # 埋め込みを含むシンプルなトップレベルの遷移を許可する
   if req['headers']['sec-fetch-mode'] == 'navigate' and req.method == 'GET':
       return True
 
-  # Reject all other requests
+  # その他のリクエストを拒否する
   return False
 ```
 
-## Considerations
-It should be safe to set a `Cross-Origin-Resource-Policy: same-site` response header on all requests that have not explicitly been exempted from Resource Isolation Policy. See [CORP]({{< ref "../opt-in/corp.md" >}}).
+## 考慮事項
+Resource Isolation Policyから明示的に除外されていないすべてのリクエストに `Cross-Origin-Resource-Policy: same-site` レスポンスヘッダを設定しても問題ないはずです。[CORP]({{< ref "../opt-in/corp.md" >}})を参照してください。
 
+## デプロイメント
 
-## Deployment
-
-Check out this [web.dev](https://web.dev/fetch-metadata/) article to learn more about this protection, some different policies, and tips on how to deploy it.
+[web.dev](https://web.dev/fetch-metadata/)の記事で、この保護機能についての詳細や異なるポリシー、導入方法のヒントをご覧ください。
