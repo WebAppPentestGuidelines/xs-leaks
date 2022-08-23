@@ -12,11 +12,11 @@ defenses = [ "Document Policies" ]
 menu = "main"
 +++
 
-Scroll to Text Fragment (STTF) は、ユーザーがウェブページのテキストの任意の部分へのリンクを作成できるWebプラットフォームの新機能です。フラグメント`#:~:text=`は、ハイライトされ、ブラウザによってビューポートにもたらされるテキストスニペットを運びます。この機能は、攻撃者がこの動作が発生したときに検出することができれば、新しいXS-Leakを導入することができます。この問題は、[Scroll to CSS Selector](https://docs.google.com/document/d/15HVLD6nddA0OaI8Dd0ayBP2jlGw5JpRD-njAyY1oNZo/edit#heading=h.wds2qckm3kh5)のXS-Leakに非常によく似ています。
+Scroll to Text Fragment (STTF) は、ユーザーがウェブページのテキストの任意の部分へのリンクを作成できるWebプラットフォームの新機能です。フラグメント`#:~:text=`は、ブラウザによって強調表示されてビューポートに取り込まれるテキストスニペットを運びます。この機能は、攻撃者がこの動作の発生を検出できることで、新しいXS-Leakをもたらします。この問題は、[Scroll to CSS Selector](https://docs.google.com/document/d/15HVLD6nddA0OaI8Dd0ayBP2jlGw5JpRD-njAyY1oNZo/edit#heading=h.wds2qckm3kh5)のXS-Leakに非常によく似ています。
 
 ## 期待される課題・議論される課題
 
-この機能の仕様に関する初期の議論では、単純な実装でいくつかのXS-Leakが導入できることが示されました[^1]。この仕様では、様々な攻撃シナリオ[^3]が考慮されており、Googleの研究結果も同様です[^4]。この機能を実装する際、ブラウザが注意すべきXS-Leakの可能性の1つは、以下の通りです。
+この機能の仕様に関する初期の議論では、単純な実装でいくつかのXS-Leakをもたらせることが示されました[^1]。この仕様では、様々な攻撃シナリオ[^3]が考慮されており、Googleの研究結果も同様です[^4]。この機能を実装する際、ブラウザが注意すべきXS-Leakの可能性の1つは、以下の通りです。
 - 攻撃者は、ページを`iframe`として埋め込むことで、親ドキュメントの`onblur`イベントを聞くことによって、ページがテキストにスクロールされたかどうかを検出することができます。この方法は、[ID Attribute XS-Leak]({{< ref "id-attribute.md" >}})と類似しています。このシナリオは、Chromeの実装[^5]では、トップレベルのナビゲーションで発生するフラグメントナビゲーションのみを許可しているため、緩和されています。
 
 ## 現在の課題

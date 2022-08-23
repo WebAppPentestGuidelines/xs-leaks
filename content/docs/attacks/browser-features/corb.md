@@ -17,7 +17,7 @@ menu = "main"
 weight = 2
 +++
 
-[Cross-Origin Read Blocking]({{< ref "/docs/defenses/secure-defaults/corb.md" >}}) (CORB) は、Spectre などの投機的サイドチャネル攻撃の影響を軽減することを目的とした、Web プラットフォームのセキュリティ機能です。残念ながら、特定のタイプのリクエストをブロックすることで、あるリクエストではCORBが実行され、別のリクエストでは実行されなかったことを攻撃者が検出できる、新しいタイプのXS-Leaks [^1] が導入されました。とはいえ、導入されたXS-Leaksは、CORBによって積極的に保護される問題(Spectreなど)よりもはるかに影響は少ないです。
+[Cross-Origin Read Blocking]({{< ref "/docs/defenses/secure-defaults/corb.md" >}}) (CORB) は、Spectre などの投機的サイドチャネル攻撃の影響を軽減することを目的とした、Web プラットフォームのセキュリティ機能です。残念ながら、特定のタイプのリクエストをブロックすることで、あるリクエストではCORBが実行され、別のリクエストでは実行されなかったことを攻撃者が検出できる、新しいタイプのXS-Leaks [^1] をもたらしました。とはいえ、このXS-Leaksは、CORBによって積極的に保護される問題(Spectreなど)よりもはるかに影響は少ないです。
 
 {{< hint info >}}
 これはChromiumの既知の問題であり、[未修正のまま]((https://docs.google.com/document/d/1kdqstoT1uH5JafGmRXrtKE4yVfjUVmXitjcvJ4tbBvM/edit?ts=5f2c8004))であるかもしれませんが、Chromiumベースのブラウザで[デフォルトでSameSite Cookieが展開される](https://blog.chromium.org/2020/05/resuming-samesite-cookie-changes-in-july.html)ことにより、その影響は大きく軽減されます。
@@ -25,7 +25,7 @@ weight = 2
 
 ## CORB & Error Events
 
-攻撃者は、CORBがレスポンスからボディとヘッダーを取り除く結果となるステータス コード`2xx`で、レスポンスが*CORB protected*`Content-Type`（および`nosniff`）を返す場合、CORBの保護機能が強制的に実行されたことを観察することができます。この保護機能を検出すると、攻撃者はステータスコード (成功 もしくは エラー) と `Content-Type` (CORBで保護されているかどうか) の両方の組み合わせを漏らすことができます。これにより、以下の例に示すように、2つの可能な状態を区別することができます。
+攻撃者は、CORBがレスポンスからボディとヘッダーを取り除く結果となるステータス コード`2xx`で、レスポンスが*CORB protected*`Content-Type`（および`nosniff`）を返す場合、CORBの保護機能が強制的に実行されたことを観察することができます。この保護機能を検出すると、攻撃者はステータスコード (成功 もしくは エラー) と `Content-Type` (CORBで保護されているかどうか) の両方の組み合わせをリークさせることができます。これにより、以下の例に示すように、2つの可能な状態を区別することができます。
 * 1番目の状態はリクエストがCORBによって保護され、2番目の状態では、クライアントエラー（404）となる。
 * 1番目の状態はCORBによって保護され、2番目の状態では保護されない。
 
@@ -40,7 +40,7 @@ weight = 2
 
 ## `nosniff`ヘッダーの検出
 
-CORBは、リクエストに `nosniff` ヘッダーが存在する場合、攻撃者に検出させることも可能です。この問題は、CORBがこのヘッダーの存在と一部のスニッフィングアルゴリズムによってのみ強制的に実行されることに起因しています。以下の例では、2つの区別可能な状態を示しています。
+CORBは、リクエストに `nosniff` ヘッダーが存在する場合、攻撃者に検出されてしまう可能性があります。この問題は、CORBがこのヘッダーの存在と一部のスニッフィングアルゴリズムによってのみ強制的に実行されることに起因しています。以下の例では、2つの区別可能な状態を示しています。
 
 1. CORBは、リソースが`nosniff`ヘッダーと共に`Content-Type`が`text/html`で提供される場合、`script`として認識されたリソースを埋め込んだ攻撃者ページを防止します。
 2. リソースが`nosniff`を設定せず、CORBがページの `Content-Type`を[推測できない場合](https://chromium.googlesource.com/chromium/src/+/master/services/network/cross_origin_read_blocking_explainer.md#what-types-of-content-are-protected-by-corb)（`text/html`のまま）、コンテンツが有効なJavaScriptとして解析できないため`SyntaxError`が発生します。このエラーは、`script`タグが[特定の条件](https://developer.mozilla.org/en-US/docs/Web/API/HTMLScriptElement)下でのみエラーイベントをトリガーするため、`window.onerror` をリッスンすることで捕捉できます。
@@ -55,7 +55,7 @@ CORBは、リクエストに `nosniff` ヘッダーが存在する場合、攻�
 🔗 – 異なるシナリオに対して有効な防御機構を組み合わせる必要があります。
 
 {{< hint tip >}}
-開発者は、アプリケーションのサブリソースに[CORP]({{< ref "/docs/defenses/opt-in/corp.md" >}})を展開し、いつ行動するかを決定するためにレスポンスを検査しないCORBと同様の保護を強制することができます。攻撃者がこのXS-Leakを悪用するのを防ぐために、一般的なXS-Leakの防御メカニズムも有効です。
+開発者は、アプリケーションのサブリソースに[CORP]({{< ref "/docs/defenses/opt-in/corp.md" >}})を展開し、いつ動作するかを決定するためにレスポンスを検査しないCORBと同様の保護を強制することができます。攻撃者がこのXS-Leakを悪用するのを防ぐために、一般的なXS-Leakの防御メカニズムも有効です。
 {{< /hint >}}
 
 ## 参考文献

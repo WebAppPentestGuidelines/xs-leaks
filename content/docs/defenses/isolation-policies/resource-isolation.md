@@ -12,7 +12,7 @@ Resource Isolation Policyは、外部のWebサイトがリソースを要求す�
 
 ## Fetch Metadataを用いた実装
 
-以下のスニペットは、[Fetch Metadata]({{< ref "../opt-in/fetch-metadata.md">}}) ヘッダーを使用したResource Isolation Policyの実装例を示しています:
+以下のコードは、[Fetch Metadata]({{< ref "../opt-in/fetch-metadata.md">}}) ヘッダーを使用したResource Isolation Policyの実装例を示しています:
 
 ```py
 # クロスサイトリクエストを拒否し、クリックジャッキングやXS-Leaks、他のバグから保護します

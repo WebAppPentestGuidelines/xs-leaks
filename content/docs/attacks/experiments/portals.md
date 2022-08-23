@@ -12,7 +12,7 @@ menu = "main"
 
 ## ID Leaks
 
-Portalsは、[ID Attribute XS-Leak]({{< ref "../id-attribute.md" >}})[framing protections]({{< ref "../../defenses/opt-in/xfo.md" >}})を設定している場合、`Portals` 要素を代わりに使って同じ手法を適用することができます[^1]。
+Portalsは、[ID Attribute XS-Leak]({{< ref "../id-attribute.md" >}})の代わりとして悪用される可能性があります。Webサイトが[framing protections]({{< ref "../../defenses/opt-in/xfo.md" >}})を設定している場合、`Portals` 要素を代わりに利用することで同じ手法を適用することができます[^1]。
 
 ## 参考文献
 
