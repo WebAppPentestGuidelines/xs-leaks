@@ -1,330 +1,37 @@
-<!doctype html><html lang=en>
-<head>
-<meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<meta name=description content="Cross-site search (XS-Search) is an important attack principle in the family of XS-Leaks. This type of attack abuses Query-Based Search Systems to leak user information from an attacker origin 1 2. The original attack uses timing measurements to detect whether or not a search system returns results and works as follows:
- Establish a baseline of the time needed for a request to return results (hit), and a baseline for the time needed by a request with no results (miss).">
-<meta name=theme-color content="#FFFFFF"><meta property="og:title" content="XS-Search">
-<meta property="og:description" content="Cross-site search (XS-Search) is an important attack principle in the family of XS-Leaks. This type of attack abuses Query-Based Search Systems to leak user information from an attacker origin 1 2. The original attack uses timing measurements to detect whether or not a search system returns results and works as follows:
- Establish a baseline of the time needed for a request to return results (hit), and a baseline for the time needed by a request with no results (miss).">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://xsleaks.dev/docs/attacks/xs-search/"><meta property="article:section" content="docs">
-<meta property="article:published_time" content="2020-10-01T00:00:00+00:00">
-<meta property="article:modified_time" content="2020-12-21T17:43:47+01:00">
-<title>XS-Search | XS-Leaks Wiki</title>
-<link rel=manifest href=/manifest.json>
-<link rel=icon href=/favicon.png type=image/x-icon>
-<link rel=stylesheet href=/book.min.1c9a9009be3c645cbccbe64eb0a90e28621e4118971d9a502db4aaa9bec96cfc.css integrity="sha256-HJqQCb48ZFy8y+ZOsKkOKGIeQRiXHZpQLbSqqb7JbPw=">
-<script defer src=/en.search.min.057cc5710ab6d726408794395eee8acbf21f5612015119aba8260d213d66edc0.js integrity="sha256-BXzFcQq21yZAh5Q5Xu6Ky/IfVhIBURmrqCYNIT1m7cA="></script>
-<script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk="></script>
-</head>
-<body>
-<input type=checkbox class="hidden toggle" id=menu-control>
-<input type=checkbox class="hidden toggle" id=toc-control>
-<main class="container flex">
-<aside class=book-menu>
-<nav>
-<h2 class=book-brand>
-<a href=/><span>XS-Leaks Wiki</span>
-</a>
-</h2>
-<div class=book-search>
-<input type=text id=book-search-input placeholder=Search aria-label=Search maxlength=64 data-hotkeys=s/>
-<div class="book-search-spinner hidden"></div>
-<ul id=book-search-results></ul>
-</div>
-<ul>
-<li class=book-section-flat>
-<span>Attacks</span>
-<ul>
-<li>
-<a href=/docs/attacks/xs-search/ class=active>XS-Search</a>
-</li>
-<li>
-<a href=/docs/attacks/window-references/>Window References</a>
-</li>
-<li>
-<a href=/docs/attacks/css-tricks/>CSS Tricks</a>
-</li>
-<li>
-<a href=/docs/attacks/error-events/>Error Events</a>
-</li>
-<li>
-<a href=/docs/attacks/frame-counting/>Frame Counting</a>
-</li>
-<li>
-<a href=/docs/attacks/navigations/>Navigations</a>
-</li>
-<li>
-<a href=/docs/attacks/cache-probing/>Cache Probing</a>
-</li>
-<li>
-<a href=/docs/attacks/element-leaks/>Element leaks</a>
-</li>
-<li>
-<a href=/docs/attacks/id-attribute/>ID Attribute</a>
-</li>
-<li>
-<a href=/docs/attacks/postmessage-broadcasts/>postMessage Broadcasts</a>
-</li>
-<li>
-<span>Browser Features</span>
-<ul>
-<li>
-<a href=/docs/attacks/browser-features/corb/>CORB Leaks</a>
-</li>
-<li>
-<a href=/docs/attacks/browser-features/corp/>CORP Leaks</a>
-</li>
-</ul>
-</li>
-<li>
-<span>Timing Attacks</span>
-<ul>
-<li>
-<a href=/docs/attacks/timing-attacks/clocks/>Clocks</a>
-</li>
-<li>
-<a href=/docs/attacks/timing-attacks/network-timing/>Network Timing</a>
-</li>
-<li>
-<a href=/docs/attacks/timing-attacks/performance-api/>Performance API</a>
-</li>
-<li>
-<a href=/docs/attacks/timing-attacks/execution-timing/>Execution Timing</a>
-</li>
-<li>
-<a href=/docs/attacks/timing-attacks/hybrid-timing/>Hybrid Timing</a>
-</li>
-<li>
-<a href=/docs/attacks/timing-attacks/connection-pool/>Connection Pool</a>
-</li>
-</ul>
-</li>
-<li>
-<a href=/docs/attacks/experiments/ class=collapsed>Experiments</a>
-</li>
-<li>
-<a href=/docs/attacks/css-injection/>CSS Injection</a>
-</li>
-<li>
-<a href=/docs/attacks/historical/ class=collapsed>Historical</a>
-</li>
-</ul>
-</li>
-<li class=book-section-flat>
-<a href=/docs/defenses/>Defense Mechanisms</a>
-<ul>
-<li>
-<a href=/docs/defenses/design-protections/>Application Design</a>
-<ul>
-<li>
-<a href=/docs/defenses/design-protections/cache-protections/>Cache Protections</a>
-</li>
-<li>
-<a href=/docs/defenses/design-protections/subresource-protections/>Subresource Protections</a>
-</li>
-</ul>
-</li>
-<li>
-<a href=/docs/defenses/opt-in/>Opt-In Mechanisms</a>
-<ul>
-<li>
-<a href=/docs/defenses/opt-in/fetch-metadata/>Fetch Metadata</a>
-</li>
-<li>
-<a href=/docs/defenses/opt-in/coop/>Cross-Origin-Opener-Policy</a>
-</li>
-<li>
-<a href=/docs/defenses/opt-in/corp/>Cross-Origin-Resource-Policy</a>
-</li>
-<li>
-<a href=/docs/defenses/opt-in/xfo/>Framing Protections</a>
-</li>
-<li>
-<a href=/docs/defenses/opt-in/same-site-cookies/>SameSite Cookies</a>
-</li>
-<li>
-<a href=/docs/defenses/opt-in/document-policies/>Document Policies</a>
-</li>
-</ul>
-</li>
-<li>
-<a href=/docs/defenses/isolation-policies/>Isolation Policies</a>
-<ul>
-<li>
-<a href=/docs/defenses/isolation-policies/resource-isolation/>Resource Isolation Policy</a>
-</li>
-<li>
-<a href=/docs/defenses/isolation-policies/framing-isolation/>Framing Isolation Policy</a>
-</li>
-<li>
-<a href=/docs/defenses/isolation-policies/navigation-isolation/>Navigation Isolation Policy</a>
-</li>
-<li>
-<a href=/docs/defenses/isolation-policies/strict-isolation/>Strict Isolation Policy</a>
-</li>
-</ul>
-</li>
-<li>
-<a href=/docs/defenses/secure-defaults/>Secure Defaults</a>
-<ul>
-<li>
-<a href=/docs/defenses/secure-defaults/corb/>Cross-Origin Read Blocking</a>
-</li>
-<li>
-<a href=/docs/defenses/secure-defaults/partitioned-cache/>Partitioned HTTP Cache</a>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class=book-section-flat>
-<a href=/docs/contributions/>Contributions</a>
-<ul>
-</ul>
-</li>
-</ul>
-</nav>
-<script>(function(){var a=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(b){localStorage.setItem("menu.scrollTop",a.scrollTop)}),a.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
-</aside>
-<div class=book-page>
-<header class=book-header>
-<div class="flex align-center justify-between">
-<label for=menu-control>
-<img src=/svg/menu.svg class=book-icon alt=Menu>
-</label>
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="XS-Search（クロスサイトサーチ）は、XS-Leaksのファミリーの中で重要な攻撃原理です。 この種の攻撃は、クエリベースの検索システムを悪用し、攻撃者のオリジンからユーザー情報をリークさせます1 2。
+元々の攻撃は、検索システムが結果を返すかどうかを検出するためにレスポンス時間を用いて、以下のように行います。
+リクエストの結果がヒットした場合の時間(hit）と、結果がヒットしなかった場合の時間(miss)を計測する。 検索エンドポイントへのリクエストに対して、timing attackを開始し、最初の文字 (?q=r) をブルートフォースで攻撃する。 2.で計測した時間が1.で計測したhitである場合、もう一文字追加する (?q=ra); そうでなければ、新しい文字 (?q=s) を試す。 最終的に、完全なシークレット(?q=secret)を取得できる。 この攻撃は、正確さを期すために複数のタイミング測定が必要であり、インフレーション技術や統計分析によって改善することができます。 さらに、一文字ずつブルートフォースするのではなく、攻撃者は特定の単語や文章を検索して結果の出現箇所のみを漏洩させることができます。
+この攻撃の最も重要な部分はその原理であり、様々なXS-Leaksに適用することが可能です。
+レスポンス時間の増加方法 # XS-Searchのインフレーション技術は、2つのレスポンス（hitまたはmiss）を区別しやすくすることで攻撃の精度を上げるために使用されます。 以下の2つのメカニズムにより、攻撃者はより適切な計測を行うことができます。
+検索システムが結果を返す際に、特定のGETパラメータをレスポンスに反映させるとレスポンスのサイズが大きくなる。これによりレスポンスをネットワーク上に送信する時間が大幅に増加するため、リクエストをより区別しやすくする。 レスポンスを返す前に、サーバーにさらに計算作業を実行させる。この方法は、より表現力の高いクエリー言語を提供する検索システムに適用できる。（例：Gmailのexclude termsは結果内のすべての文字を処理する） 拡張原理 # XS-Search に関するオリジナルの研究はタイミング攻撃に焦点を当てていましたが、この攻撃の原理は他の XS-Leak にも拡張することができます。 前述のように信頼性の低いタイミング測定に頼るのではなく、攻撃者は他の XS-Leak を利用して同じ情報を抽出することができます。
+クエリベースの検索システムでは、ユーザーはクエリを送信し、そのクエリに関連するレスポンスを取得します。 この動作は、2つの異なる結果をもたらす可能性があります。
+システムが結果を表示し、ページが特定の動作をする(第1の状態)。 システムが結果を表示せず、ページがステップ1とは異なる方法で動作する(第2の状態)。 上記の両方の挙動をタイミングよりも信頼性の高い XS-Leak で区別できる場合、攻撃者はより効率的な XS-Search 攻撃を行うことができます。 例えば、検索結果によってページのフレーム数が変化する（ステップ1と2が区別できる）場合、この攻撃原理は Frame Counting XS-Leak を適用することができるため、タイミング測定を使用するよりも正確である可能性があります。
+対策 # Attack Alternative SameSite Cookies (Lax) COOP Framing Protections Isolation Policies XS-Search (timing) ✔️ ❌ ❌ RIP 🔗 NIP 🔗 – 異なるシナリオに対して有効な防御機構を組み合わせる必要があります"><meta name=theme-color content="#FFFFFF"><meta property="og:title" content="XS-Search"><meta property="og:description" content="XS-Search（クロスサイトサーチ）は、XS-Leaksのファミリーの中で重要な攻撃原理です。 この種の攻撃は、クエリベースの検索システムを悪用し、攻撃者のオリジンからユーザー情報をリークさせます1 2。
+元々の攻撃は、検索システムが結果を返すかどうかを検出するためにレスポンス時間を用いて、以下のように行います。
+リクエストの結果がヒットした場合の時間(hit）と、結果がヒットしなかった場合の時間(miss)を計測する。 検索エンドポイントへのリクエストに対して、timing attackを開始し、最初の文字 (?q=r) をブルートフォースで攻撃する。 2.で計測した時間が1.で計測したhitである場合、もう一文字追加する (?q=ra); そうでなければ、新しい文字 (?q=s) を試す。 最終的に、完全なシークレット(?q=secret)を取得できる。 この攻撃は、正確さを期すために複数のタイミング測定が必要であり、インフレーション技術や統計分析によって改善することができます。 さらに、一文字ずつブルートフォースするのではなく、攻撃者は特定の単語や文章を検索して結果の出現箇所のみを漏洩させることができます。
+この攻撃の最も重要な部分はその原理であり、様々なXS-Leaksに適用することが可能です。
+レスポンス時間の増加方法 # XS-Searchのインフレーション技術は、2つのレスポンス（hitまたはmiss）を区別しやすくすることで攻撃の精度を上げるために使用されます。 以下の2つのメカニズムにより、攻撃者はより適切な計測を行うことができます。
+検索システムが結果を返す際に、特定のGETパラメータをレスポンスに反映させるとレスポンスのサイズが大きくなる。これによりレスポンスをネットワーク上に送信する時間が大幅に増加するため、リクエストをより区別しやすくする。 レスポンスを返す前に、サーバーにさらに計算作業を実行させる。この方法は、より表現力の高いクエリー言語を提供する検索システムに適用できる。（例：Gmailのexclude termsは結果内のすべての文字を処理する） 拡張原理 # XS-Search に関するオリジナルの研究はタイミング攻撃に焦点を当てていましたが、この攻撃の原理は他の XS-Leak にも拡張することができます。 前述のように信頼性の低いタイミング測定に頼るのではなく、攻撃者は他の XS-Leak を利用して同じ情報を抽出することができます。
+クエリベースの検索システムでは、ユーザーはクエリを送信し、そのクエリに関連するレスポンスを取得します。 この動作は、2つの異なる結果をもたらす可能性があります。
+システムが結果を表示し、ページが特定の動作をする(第1の状態)。 システムが結果を表示せず、ページがステップ1とは異なる方法で動作する(第2の状態)。 上記の両方の挙動をタイミングよりも信頼性の高い XS-Leak で区別できる場合、攻撃者はより効率的な XS-Search 攻撃を行うことができます。 例えば、検索結果によってページのフレーム数が変化する（ステップ1と2が区別できる）場合、この攻撃原理は Frame Counting XS-Leak を適用することができるため、タイミング測定を使用するよりも正確である可能性があります。
+対策 # Attack Alternative SameSite Cookies (Lax) COOP Framing Protections Isolation Policies XS-Search (timing) ✔️ ❌ ❌ RIP 🔗 NIP 🔗 – 異なるシナリオに対して有効な防御機構を組み合わせる必要があります"><meta property="og:type" content="article"><meta property="og:url" content="https://xsleaks.dev/docs/attacks/xs-search/"><meta property="article:section" content="docs"><meta property="article:published_time" content="2020-10-01T00:00:00+00:00"><meta property="article:modified_time" content="2022-09-01T01:32:15+09:00"><title>XS-Search | XS-Leaks Wiki</title><link rel=manifest href=/manifest.json><link rel=icon href=/favicon.png type=image/x-icon><link rel=stylesheet href=/book.min.1c9a9009be3c645cbccbe64eb0a90e28621e4118971d9a502db4aaa9bec96cfc.css integrity="sha256-HJqQCb48ZFy8y+ZOsKkOKGIeQRiXHZpQLbSqqb7JbPw="><script defer src=/en.search.min.191ebcb00d5c065f5f76aacb6507e71d1fe649eb2858975535f0380f4e272c40.js integrity="sha256-GR68sA1cBl9fdqrLZQfnHR/mSesoWJdVNfA4D04nLEA="></script>
+<script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk="></script></head><body><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><nav><h2 class=book-brand><a href=/><span>XS-Leaks Wiki</span></a></h2><div class=book-search><input type=text id=book-search-input placeholder=Search aria-label=Search maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><ul><li class=book-section-flat><span>攻撃手法</span><ul><li><a href=/docs/attacks/xs-search/ class=active>XS-Search</a></li><li><a href=/docs/attacks/window-references/>Window References</a></li><li><a href=/docs/attacks/css-tricks/>CSS Tricks</a></li><li><a href=/docs/attacks/error-events/>Error Events</a></li><li><a href=/docs/attacks/frame-counting/>Frame Counting</a></li><li><a href=/docs/attacks/navigations/>Navigations</a></li><li><a href=/docs/attacks/cache-probing/>Cache Probing</a></li><li><a href=/docs/attacks/element-leaks/>Element leaks</a></li><li><a href=/docs/attacks/id-attribute/>ID Attribute</a></li><li><a href=/docs/attacks/postmessage-broadcasts/>postMessage Broadcasts</a></li><li><span>Browser Features</span><ul><li><a href=/docs/attacks/browser-features/corb/>CORB Leaks</a></li><li><a href=/docs/attacks/browser-features/corp/>CORP Leaks</a></li></ul></li><li><span>Timing Attacks</span><ul><li><a href=/docs/attacks/timing-attacks/clocks/>Clocks</a></li><li><a href=/docs/attacks/timing-attacks/network-timing/>Network Timing</a></li><li><a href=/docs/attacks/timing-attacks/performance-api/>Performance API</a></li><li><a href=/docs/attacks/timing-attacks/execution-timing/>Execution Timing</a></li><li><a href=/docs/attacks/timing-attacks/hybrid-timing/>Hybrid Timing</a></li><li><a href=/docs/attacks/timing-attacks/connection-pool/>Connection Pool</a></li></ul></li><li><a href=/docs/attacks/experiments/ class=collapsed>Experiments</a></li><li><a href=/docs/attacks/css-injection/>CSS Injection</a></li><li><a href=/docs/attacks/historical/ class=collapsed>Historical</a></li></ul></li><li class=book-section-flat><a href=/docs/defenses/>対策の仕組み</a><ul><li><a href=/docs/defenses/design-protections/>Application Design</a><ul><li><a href=/docs/defenses/design-protections/cache-protections/>Cache Protections</a></li><li><a href=/docs/defenses/design-protections/subresource-protections/>Subresource Protections</a></li></ul></li><li><a href=/docs/defenses/opt-in/>Opt-In Mechanisms</a><ul><li><a href=/docs/defenses/opt-in/fetch-metadata/>Fetch Metadata</a></li><li><a href=/docs/defenses/opt-in/coop/>Cross-Origin-Opener-Policy</a></li><li><a href=/docs/defenses/opt-in/corp/>Cross-Origin-Resource-Policy</a></li><li><a href=/docs/defenses/opt-in/xfo/>Framing Protections</a></li><li><a href=/docs/defenses/opt-in/same-site-cookies/>SameSite Cookies</a></li><li><a href=/docs/defenses/opt-in/document-policies/>Document Policies</a></li></ul></li><li><a href=/docs/defenses/isolation-policies/>Isolation Policies</a><ul><li><a href=/docs/defenses/isolation-policies/resource-isolation/>Resource Isolation Policy</a></li><li><a href=/docs/defenses/isolation-policies/framing-isolation/>Framing Isolation Policy</a></li><li><a href=/docs/defenses/isolation-policies/navigation-isolation/>Navigation Isolation Policy</a></li><li><a href=/docs/defenses/isolation-policies/strict-isolation/>Strict Isolation Policy</a></li></ul></li><li><a href=/docs/defenses/secure-defaults/>Secure Defaults</a><ul><li><a href=/docs/defenses/secure-defaults/corb/>Cross-Origin Read Blocking</a></li><li><a href=/docs/defenses/secure-defaults/partitioned-cache/>Partitioned HTTP Cache</a></li></ul></li></ul></li><li class=book-section-flat><a href=/docs/contributions/>Contributions</a><ul></ul></li></ul></nav><script>(function(){var e=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu></label>
 <strong>XS-Search</strong>
-<label for=toc-control>
-<img src=/svg/toc.svg class=book-icon alt="Table of Contents">
-</label>
-</div>
-<aside class="hidden clearfix">
-<nav id=TableOfContents>
-<ul>
-<li><a href=#inflation-techniques>Inflation Techniques</a></li>
-<li><a href=#extended-principle>Extended Principle</a></li>
-<li><a href=#defense>Defense</a></li>
-<li><a href=#references>References</a></li>
-</ul>
-</nav>
-</aside>
-</header>
-<article class=markdown>
-<h1>
-XS-Search
-</h1>
-<h5>October 1, 2020</h5>
-<div>
-Category
+<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav id=TableOfContents><ul><li><a href=#レスポンス時間の増加方法>レスポンス時間の増加方法</a></li><li><a href=#拡張原理>拡張原理</a></li><li><a href=#対策>対策</a></li><li><a href=#references>References</a></li></ul></nav></aside></header><article class=markdown><h1>XS-Search</h1><h5>October 1, 2020</h5><div>Category
 <a href=/category/attack/>Attack</a>,
-<a href=/category/attack-principle/>Attack Principle</a>
-</div>
-<div>
-Defenses
+<a href=/category/attack-principle/>Attack Principle</a></div><div>Defenses
 <a href=/defenses/fetch-metadata/>Fetch Metadata</a>,
-<a href=/defenses/samesite-cookies/>SameSite Cookies</a>
-</div>
-<p><p>Cross-site search (XS-Search) is an important attack principle in the family of XS-Leaks. This type of attack abuses Query-Based Search Systems to leak user information from an attacker origin <sup id=fnref:1><a href=#fn:1 class=footnote-ref role=doc-noteref>1</a></sup> <sup id=fnref:2><a href=#fn:2 class=footnote-ref role=doc-noteref>2</a></sup>. The original attack uses timing measurements to detect whether or not a search system returns results and works as follows:</p>
-<ol>
-<li>Establish a baseline of the time needed for a request to return results (hit), and a baseline for the time needed by a request with no results (miss).</li>
-<li>Start a <a href=https://xsleaks.dev/docs/attacks/timing-attacks/network-timing/>timing attack</a> on the request to the search endpoint, brute-forcing the first character (<code>?q=r</code>).</li>
-<li>If the measurement is under the hit baseline, then add one more character (<code>?q=ra</code>); otherwise try a new one (<code>?q=s</code>).</li>
-<li>In the end, a full secret (<code>?q=secret</code>) can be leaked.</li>
-</ol>
-<p>This attack requires multiple timing measurements to be accurate, something which can be improved with inflation techniques and statistical analysis. Furthermore, instead of brute-forcing letter by letter, attackers can search specific words or sentences to leak only the occurrence of results.</p>
-<p>The most important part of this attack is its principle, as it can be applied to a number of different XS-Leaks.</p>
-<h2 id=inflation-techniques>
-Inflation Techniques
-<a class=anchor href=#inflation-techniques>#</a>
-</h2>
-<p>The inflation techniques of XS-Search are used to increase the accuracy of the attack to make the two response types (hit or miss) easier to distinguish. The following two mechanisms allow attackers to make better measurements:</p>
-<ul>
-<li>If a search system reflects certain GET parameters into the response when returning results, the size of the response increases. This makes the request more distinguishable because the time to prepare the response and send it over the network grows substantially.</li>
-<li>Force the server to perform more computation work before returning a response. This approach can be applied in search systems offering more expressive query languages (e.g. exclude terms in Gmail needs to process every character in the results).</li>
-</ul>
-<h2 id=extended-principle>
-Extended Principle
-<a class=anchor href=#extended-principle>#</a>
-</h2>
-<p>While the original research around XS-Search focused on timing attacks, the principle of the attack extends to other XS-Leaks. Instead of relying on timing measurements, which are unreliable, attackers can use other XS-Leaks to extract the same information.</p>
-<p>In a Query-Based Search System, a user submits queries and gets responses associated with those queries. This action can result in two different outcomes:</p>
-<ol>
-<li>The system shows results and the page behaves in a specific way (first state).</li>
-<li>The system does not show results and the page behaves in a different way than in step 1 (second state).</li>
-</ol>
-<p>If both behaviors above can be distinguished by a more reliable XS-Leak than timing, then an attacker could perform a more efficient XS-Search attack. For example, if the number of frames on a page varies based on search results (step 1 and 2 are distinguishable), this attack principle can be applied with a <a href=https://xsleaks.dev/docs/attacks/frame-counting/>Frame Counting</a> XS-Leak which could be more accurate than one using timing measurements.</p>
-<h2 id=defense>
-Defense
-<a class=anchor href=#defense>#</a>
-</h2>
-<table>
-<thead>
-<tr>
-<th style=text-align:center>Attack Alternative</th>
-<th style=text-align:center><a href=https://xsleaks.dev/docs/defenses/opt-in/same-site-cookies/>SameSite Cookies (Lax)</a></th>
-<th style=text-align:center><a href=https://xsleaks.dev/docs/defenses/opt-in/coop/>COOP</a></th>
-<th style=text-align:center><a href=https://xsleaks.dev/docs/defenses/opt-in/xfo/>Framing Protections</a></th>
-<th style=text-align:center><a href=https://xsleaks.dev/docs/defenses/isolation-policies/>Isolation Policies</a></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style=text-align:center>XS-Search (timing)</td>
-<td style=text-align:center>✔️</td>
-<td style=text-align:center>❌</td>
-<td style=text-align:center>❌</td>
-<td style=text-align:center><a href=https://xsleaks.dev/docs/defenses/isolation-policies/resource-isolation/>RIP</a> 🔗 <a href=https://xsleaks.dev/docs/defenses/isolation-policies/navigation-isolation/>NIP</a></td>
-</tr>
-</tbody>
-</table>
-<p>🔗 – Defense mechanisms must be combined to be effective against different scenarios.</p>
-<h2 id=references>
-References
-<a class=anchor href=#references>#</a>
-</h2>
-<section class=footnotes role=doc-endnotes>
-<hr>
-<ol>
-<li id=fn:1 role=doc-endnote>
-<p>Cross-Site Search Attacks, <a href=https://446h.cybersec.fun/xssearch.pdf>link</a>&#160;<a href=#fnref:1 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p>
-</li>
-<li id=fn:2 role=doc-endnote>
-<p>Cross-Site Search (XS-Search) Attacks - Hemi Leibowitz, OWASP AppSec IL 2015, <a href=https://owasp.org/www-pdf-archive/AppSecIL2015_Cross-Site-Search-Attacks_HemiLeibowitz.pdf>link</a>&#160;<a href=#fnref:2 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p>
-</li>
-</ol>
-</section>
-</p>
-</article>
-<footer class=book-footer>
-<div class="flex flex-wrap justify-between">
-<div><a class="flex align-center" href=https://github.com/xsleaks/wiki/commit/90f825de810b1f52c71b7e3e6732fc049f1b3a2a title="Last modified by goedi02 | December 21, 2020" target=_blank rel=noopener>
-<img src=/svg/calendar.svg class=book-icon alt=Calendar>
-<span>Last Modified: December 21, 2020</span>
-</a>
-</div>
-<div>
-<a class="flex align-center" href=https://github.com/xsleaks/wiki/edit/master/content//docs/attacks/xs-search.md target=_blank rel=noopener>
-<img src=/svg/edit.svg class=book-icon alt=Edit>
-<span>Edit this article</span>
-</a>
-</div>
-</div>
-</footer>
-<div class=book-comments>
-</div>
-<label for=menu-control class="hidden book-menu-overlay"></label>
-</div>
-<aside class=book-toc>
-<nav id=TableOfContents>
-<ul>
-<li><a href=#inflation-techniques>Inflation Techniques</a></li>
-<li><a href=#extended-principle>Extended Principle</a></li>
-<li><a href=#defense>Defense</a></li>
-<li><a href=#references>References</a></li>
-</ul>
-</nav>
-</aside>
-</main>
-</body>
-</html>
+<a href=/defenses/samesite-cookies/>SameSite Cookies</a></div><p><p>XS-Search（クロスサイトサーチ）は、XS-Leaksのファミリーの中で重要な攻撃原理です。
+この種の攻撃は、クエリベースの検索システムを悪用し、攻撃者のオリジンからユーザー情報をリークさせます<sup id=fnref:1><a href=#fn:1 class=footnote-ref role=doc-noteref>1</a></sup> <sup id=fnref:2><a href=#fn:2 class=footnote-ref role=doc-noteref>2</a></sup>。</p><p>元々の攻撃は、検索システムが結果を返すかどうかを検出するためにレスポンス時間を用いて、以下のように行います。</p><ol><li>リクエストの結果がヒットした場合の時間(hit）と、結果がヒットしなかった場合の時間(miss)を計測する。</li><li>検索エンドポイントへのリクエストに対して、<a href=https://xsleaks.dev/docs/attacks/timing-attacks/network-timing/>timing attack</a>を開始し、最初の文字 (<code>?q=r</code>) をブルートフォースで攻撃する。</li><li>2.で計測した時間が1.で計測したhitである場合、もう一文字追加する (<code>?q=ra</code>); そうでなければ、新しい文字 (<code>?q=s</code>) を試す。</li><li>最終的に、完全なシークレット(<code>?q=secret</code>)を取得できる。</li></ol><p>この攻撃は、正確さを期すために複数のタイミング測定が必要であり、インフレーション技術や統計分析によって改善することができます。
+さらに、一文字ずつブルートフォースするのではなく、攻撃者は特定の単語や文章を検索して結果の出現箇所のみを漏洩させることができます。</p><p>この攻撃の最も重要な部分はその原理であり、様々なXS-Leaksに適用することが可能です。</p><h2 id=レスポンス時間の増加方法>レスポンス時間の増加方法
+<a class=anchor href=#%e3%83%ac%e3%82%b9%e3%83%9d%e3%83%b3%e3%82%b9%e6%99%82%e9%96%93%e3%81%ae%e5%a2%97%e5%8a%a0%e6%96%b9%e6%b3%95>#</a></h2><p>XS-Searchのインフレーション技術は、2つのレスポンス（hitまたはmiss）を区別しやすくすることで攻撃の精度を上げるために使用されます。
+以下の2つのメカニズムにより、攻撃者はより適切な計測を行うことができます。</p><ul><li>検索システムが結果を返す際に、特定のGETパラメータをレスポンスに反映させるとレスポンスのサイズが大きくなる。これによりレスポンスをネットワーク上に送信する時間が大幅に増加するため、リクエストをより区別しやすくする。</li><li>レスポンスを返す前に、サーバーにさらに計算作業を実行させる。この方法は、より表現力の高いクエリー言語を提供する検索システムに適用できる。（例：Gmailのexclude termsは結果内のすべての文字を処理する）</li></ul><h2 id=拡張原理>拡張原理
+<a class=anchor href=#%e6%8b%a1%e5%bc%b5%e5%8e%9f%e7%90%86>#</a></h2><p>XS-Search に関するオリジナルの研究はタイミング攻撃に焦点を当てていましたが、この攻撃の原理は他の XS-Leak にも拡張することができます。
+前述のように信頼性の低いタイミング測定に頼るのではなく、攻撃者は他の XS-Leak を利用して同じ情報を抽出することができます。</p><p>クエリベースの検索システムでは、ユーザーはクエリを送信し、そのクエリに関連するレスポンスを取得します。
+この動作は、2つの異なる結果をもたらす可能性があります。</p><ol><li>システムが結果を表示し、ページが特定の動作をする(第1の状態)。</li><li>システムが結果を表示せず、ページがステップ1とは異なる方法で動作する(第2の状態)。</li></ol><p>上記の両方の挙動をタイミングよりも信頼性の高い XS-Leak で区別できる場合、攻撃者はより効率的な XS-Search 攻撃を行うことができます。
+例えば、検索結果によってページのフレーム数が変化する（ステップ1と2が区別できる）場合、この攻撃原理は <a href=https://xsleaks.dev/docs/attacks/frame-counting/>Frame Counting</a> XS-Leak を適用することができるため、タイミング測定を使用するよりも正確である可能性があります。</p><h2 id=対策>対策
+<a class=anchor href=#%e5%af%be%e7%ad%96>#</a></h2><table><thead><tr><th style=text-align:center>Attack Alternative</th><th style=text-align:center><a href=https://xsleaks.dev/docs/defenses/opt-in/same-site-cookies/>SameSite Cookies (Lax)</a></th><th style=text-align:center><a href=https://xsleaks.dev/docs/defenses/opt-in/coop/>COOP</a></th><th style=text-align:center><a href=https://xsleaks.dev/docs/defenses/opt-in/xfo/>Framing Protections</a></th><th style=text-align:center><a href=https://xsleaks.dev/docs/defenses/isolation-policies/>Isolation Policies</a></th></tr></thead><tbody><tr><td style=text-align:center>XS-Search (timing)</td><td style=text-align:center>✔️</td><td style=text-align:center>❌</td><td style=text-align:center>❌</td><td style=text-align:center><a href=https://xsleaks.dev/docs/defenses/isolation-policies/resource-isolation/>RIP</a> 🔗 <a href=https://xsleaks.dev/docs/defenses/isolation-policies/navigation-isolation/>NIP</a></td></tr></tbody></table><p>🔗 – 異なるシナリオに対して有効な防御機構を組み合わせる必要があります</p><h2 id=references>References
+<a class=anchor href=#references>#</a></h2><div class=footnotes role=doc-endnotes><hr><ol><li id=fn:1><p>Cross-Site Search Attacks, <a href=https://446h.cybersec.fun/xssearch.pdf>link</a>&#160;<a href=#fnref:1 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li><li id=fn:2><p>Cross-Site Search (XS-Search) Attacks - Hemi Leibowitz, OWASP AppSec IL 2015, <a href=https://owasp.org/www-pdf-archive/AppSecIL2015_Cross-Site-Search-Attacks_HemiLeibowitz.pdf>link</a>&#160;<a href=#fnref:2 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li></ol></div></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"><div><a class="flex align-center" href=https://github.com/xsleaks/wiki/commit/c9aa1a2f7009708b9068eaae29fa63d55d7ae2dc title='Last modified by kazu1130 | August 31, 2022' target=_blank rel=noopener><img src=/svg/calendar.svg class=book-icon alt=Calendar>
+<span>Last Modified: August 31, 2022</span></a></div><div><a class="flex align-center" href=https://github.com/xsleaks/wiki/edit/master/content//docs/attacks/xs-search.md target=_blank rel=noopener><img src=/svg/edit.svg class=book-icon alt=Edit>
+<span>Edit this article</span></a></div></div></footer><div class=book-comments></div><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><nav id=TableOfContents><ul><li><a href=#レスポンス時間の増加方法>レスポンス時間の増加方法</a></li><li><a href=#拡張原理>拡張原理</a></li><li><a href=#対策>対策</a></li><li><a href=#references>References</a></li></ul></nav></aside></main></body></html>
