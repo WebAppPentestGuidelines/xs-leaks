@@ -23,3 +23,4 @@ Framing Protections を適用したウェブサイトは、攻撃者のオリジ
 ## Deployment
 
 通常、多くのアプリケーションは `iframe` 内にクロスオリジンで埋め込まれることを意図していないので、フレーミング保護を導入することは簡単です。このヘッダの利点については、この [web.dev](https://web.dev/same-origin-policy/) の記事を参照してください。
+

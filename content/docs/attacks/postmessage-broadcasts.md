@@ -15,17 +15,21 @@ menu = "main"
 weight = 3
 +++
 
-Applications often use [postMessage broadcasts](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) to share information with other origins. Using `postMessage` can lead to two kinds of XS-Leaks:
+アプリケーションは、他のオリジンと情報を共有するために、しばしば [postMessage broadcasts](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) を使用します。
+`postMessage` を使うと、2種類の XS-Leaks につながる可能性があります。
 
-* Sharing sensitive messages with untrusted origins
-    * The `postMessage` API supports a `targetOrigin` parameter that can be used to restrict which origins can receive the message. If the message contains any sensitive data, it is important to use this parameter.  
+* 信頼できない発信元と機密性の高いメッセージを共有すること
+    * `postMessage` API は `targetOrigin` パラメータをサポートしており、これを使用してメッセージを受信できるオリジンを制限することができます。メッセージに機密性の高いデータが含まれている場合、このパラメータを使用することが重要です。 
 
-* Leaking information based on varying content or on the presence of a broadcast
-    * Similar to other XS-Leak techniques, this could be used to form an oracle. For example, if an application sends a postMessage broadcast saying "Page Loaded" only if a user  with a given username exists, this could be used to leak information. 
+* 変化するコンテンツやブロードキャストの存在に基づいた情報のリーク
+    * 他の XS-Leak のテクニックと同様に、これはオラクルを形成するために使われる可能性があります。例えば、特定のユーザ名を持つユーザが存在する場合にのみ、アプリケーションが「Page Loaded」という postMessage ブロードキャストを送信すると、これを利用して情報をリークすることができます。
+    
+## 対策
 
-## Defense
+この XS-Leak は、postMessage のブロードキャスト送信の目的に深く依存するため、明確な解決策はありません。
+アプリケーションは、postMessage の通信を既知の送信元グループに制限する必要があります。
+これが不可能な場合、攻撃者が通信間の違いに基づいて情報を推論するのを防ぐために、ユーザの状態に関係なく通信が一貫して同じ動作をする必要があります。
 
-There is no clear solution to mitigate this XS-Leak as it depends deeply on the purpose of sending a postMessage broadcast. Applications should limit postMessage communications to a group of known origins. When this is not possible, the communications should behave consistently regardless of the state to prevent attackers from inferring information based on differences between the communications.
 
 ## References
 
