@@ -1,5 +1,5 @@
 ---
 weight: 1
 bookFlatSection: true
-title: "Attacks"
+title: "攻撃手法"
 ---
