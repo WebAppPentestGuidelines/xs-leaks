@@ -16,24 +16,22 @@ menu = "main"
 weight = 2
 +++
 ## Performance API
-The [`Performance API`](https://developer.mozilla.org/en-US/docs/Web/API/Performance) provides access to performance-related information enhanced by the data from the [`Resource Timing API`](https://developer.mozilla.org/en-US/docs/Web/API/Resource_Timing_API)
-which provides the timings of network requests such as the duration but when there’s a `Timing-Allow-Origin: *` header sent by the server the transfer size and domain lookup time is also provided.  
-This data can be accessed by using [`performance.getEntries`](https://developer.mozilla.org/en-US/docs/Web/API/Performance/getEntries) or [`performance.getEntriesByName`](https://developer.mozilla.org/en-US/docs/Web/API/Performance/getEntriesByName)
-It can also be used to get the execution time using the difference of [`performance.now()`](https://developer.mozilla.org/en-US/docs/Web/API/Performance/now) however this seems to be less precise for a chrome fetch because it only provides the milliseconds.
+[`Performance API`](https://developer.mozilla.org/en-US/docs/Web/API/Performance)は、[`Resource Timing API`](https://developer.mozilla.org/en-US/docs/Web/API/Resource_Timing_API)のデータによって強化されたパフォーマンス関連の情報へのアクセスを提供します。このAPIは、持続時間のようなネットワークリクエストの時間情報を提供しますが、サーバーから送られた`Timing-Allow-Origin: *`ヘッダーがある場合、転送サイズとドメイン検索時間も提供されます。 
+このデータには、 [`performance.getEntries`](https://developer.mozilla.org/en-US/docs/Web/API/Performance/getEntries)または[`performance.getEntriesByName`](https://developer.mozilla.org/en-US/docs/Web/API/Performance/getEntriesByName)を使ってアクセスすることができます。また、[`performance.now()`](https://developer.mozilla.org/en-US/docs/Web/API/Performance/now)の差分を使って実行時間を取得することもできますが、これはミリ秒しか提供しないため、Chromeのfetchでは精度が低い可能性があります。
 
-## Network duration
-It is possible to retrieve the network duration of a request from the `performance` API.
+## ネットワークのduration
+リクエストのNetwork durationを `performance` API から取得することができます。
 
-The below snippet performs a network request then after 200ms it gets the duration from the `performance` object. 
+以下のスニペットはリクエストを実行し、200ms後に `performance` オブジェクトから持続時間を取得します。
 
 ```javascript
 async function getNetworkDuration(url) {
     let href = new URL(url).href;
-    // Using an image instead of fetch() as some requests had duration = 0
+	// duration = 0 のリクエストがあるため、fetch()の代わりに画像を使用する。
     let image = new Image().src = href;
-    // Wait for request to be added to performance.getEntriesByName();
+	// performance.getEntriesByName()に追加されるリクエストを待ちます。
     await new Promise(r => setTimeout(r, 200));
-    // Get last added timings
+    // 最後に追加された時間を取得する
     let res = performance.getEntriesByName(href).pop();
     console.log("Request duration: " + res.duration);
     return res.duration
@@ -41,70 +39,71 @@ async function getNetworkDuration(url) {
 
 await getNetworkDuration('https://example.org');
 ```
-{{< hint info >}} Unlike other browsers, Firefox provides the measurements in milliseconds. {{< /hint >}}
+{{< hint info >}} 他のブラウザと異なり、Firefoxはミリ秒単位で測定値を提供します。 {{< /hint >}}
 
-## Detecting X-Frame-Options
-If displaying a page inside an embed (e.g. because of the `X-Frame-Options` header) it will not be added to the `performance` object in Chrome.
+## X-Frame-Optionsを検知する
+埋め込み内にページを表示する場合 (たとえば、`X-Frame-Options` ヘッダーのため)、Chrome の `performance` オブジェクトに追加されません。
+
 ```javascript
 async function isFrameBlocked(url) {
     let href = new URL(url).href;
-    // There may be requests for this url before the function was run.
+	// この関数が実行される前に、このURLに対するリクエストがあるかもしれません。
     let start_count = performance.getEntriesByName(href).length;
     let embed = document.createElement('embed');
     embed.setAttribute("hidden", true);
     embed.src = href;
     document.body.appendChild(embed);
-    // Wait for request to be added to performance.getEntriesByName();
+	// performance.getEntriesByName()に追加されるリクエストを待ちます。
     await new Promise(r => setTimeout(r, 1000));
-    // Remove test embed
+	// テスト用エンベッドの削除
     document.body.removeChild(embed)
     return performance.getEntriesByName(href).length === start_count;
 }
 
 await isFrameBlocked('https://example.org');
 ```
-{{< hint note >}} This technique does seem to only work in Chromium based browsers {{< /hint >}}
+{{< hint note >}} この手法はChromiumベースのブラウザでのみ有効なようです。 {{< /hint >}}
 
-# Detecting cached resources
+# キャッシュされたリソースを検知する
 
-With the `performance` API it is possible to detect whether a resource was cached or not.
-Unless [Cross-Origin Read Blocking]({{< ref "../../defenses/secure-defaults/corb.md" >}}) is triggered (resource is html) the resource will get cached in the processs of the check.  
+`performance`API を使用すると、リソースがキャッシュされたかどうかを検出することができます。
+[Cross-Origin Read Blocking]({{< ref "../../defenses/secure-defaults/corb.md" >}})が発動されない限り（リソースはhtml）、チェックの過程でリソースはキャッシュされます。 
 ```javascript
 async function ifCached2(url) {
     let href = new URL(url).href;
     await fetch(href, {mode: "no-cors", credentials: "include"});
-    // Wait for request to be added to performance.getEntriesByName();
+    // performance.getEntriesByName()に追加されるリクエストを待ちます。
     await new Promise(r => setTimeout(r, 200));
-    // Get last added timings
+    // 最後に追加された時間を取得する
     let res = performance.getEntriesByName(href).pop();
     console.log("Request duration: " + res.duration);
-    // Check if is 304
+    // 304かどうかチェックする
     if (res.encodedBodySize > 0 && res.transferSize > 0 && res.transferSize < res.encodedBodySize) return true
     if (res.transferSize > 0) return false;
     if (res.decodedBodySize > 0) return true;
-    // Use duration if theirs no Timing-Allow-Origin header
+    // Timing-Allow-Origin ヘッダがない場合、duration を使用する。
     return res.duration < 10;
 }
 ```
 
-## Connection speed
+## 通信速度
 
-It is possible to measure the speed of the connection in octets.
+オクテット単位で通信速度を測定することができます。
 ```javascript
 async function getSpeed(count = 10) {
     var total = 0;
-    // Make multiple requests for average
+	// 複数回リクエストを行い、平均値を取得する
     for (let i = 0; i < count; i++) {
-        // Make request to the current origin bypassing cache
+        // キャッシュをバイパスして現在のオリジンにリクエストを行う
         await fetch(location.href, {cache: "no-store"});
-        // Wait for timings to get added
+        // 追加されるタイミングを待つ
         await new Promise(r => setTimeout(r, 200));
-        // Get latest timing for location
+        // locationの最新のタイミングを取得する
         let page = window.performance.getEntriesByName(location.href).pop();
-        // Get response time divided by transferSize
+        // レスポンスタイムをtransferSizeで割って取得
         total += (page.responseEnd - page.responseStart) / page.transferSize;
     }
-    // Get average response time for requests
+    // リクエストの平均レスポンスタイムを取得
     return total/count
 }
 

@@ -17,49 +17,47 @@ menu = "main"
 weight = 2
 +++
 
-[Cross-Origin Read Blocking]({{< ref "/docs/defenses/secure-defaults/corb.md" >}}) (CORB) is a web platform security feature aimed at reducing the impact of speculative side-channel attacks such as Spectre. Unfortunately, blocking certain types of requests introduced a new type of XS-Leaks [^1] that allows attackers to detect if CORB was enforced on one request, but wasn't on another. Nevertheless, the introduced XS-Leaks are much less problematic than the issues actively protected by CORB (e.g. Spectre).
-
+[Cross-Origin Read Blocking]({{< ref "/docs/defenses/secure-defaults/corb.md" >}}) (CORB) は、Spectre などの投機的サイドチャネル攻撃の影響を軽減することを目的とした、Web プラットフォームのセキュリティ機能です。残念ながら、特定のタイプのリクエストをブロックすることで、あるリクエストではCORBが実行され、別のリクエストでは実行されなかったことを攻撃者が検出できる、新しいタイプのXS-Leaks [^1] をもたらしました。とはいえ、このXS-Leaksは、CORBによって積極的に保護される問題(Spectreなど)よりもはるかに影響は少ないです。
 
 {{< hint info >}}
-This is a known issue in Chromium, and while it [might remain unfixed](https://docs.google.com/document/d/1kdqstoT1uH5JafGmRXrtKE4yVfjUVmXitjcvJ4tbBvM/edit?ts=5f2c8004), its impact is greatly reduced by the [rollout of SameSite Cookies by default](https://blog.chromium.org/2020/05/resuming-samesite-cookie-changes-in-july.html) in Chromium-based browsers.
+これはChromiumの既知の問題であり、[未修正のまま]((https://docs.google.com/document/d/1kdqstoT1uH5JafGmRXrtKE4yVfjUVmXitjcvJ4tbBvM/edit?ts=5f2c8004))であるかもしれませんが、Chromiumベースのブラウザで[デフォルトでSameSite Cookieが展開される](https://blog.chromium.org/2020/05/resuming-samesite-cookie-changes-in-july.html)ことにより、その影響は大きく軽減されます。
 {{< /hint >}}
 
 ## CORB & Error Events
 
+攻撃者は、CORBがレスポンスからボディとヘッダーを取り除く結果となるステータス コード`2xx`で、レスポンスが*CORB protected*`Content-Type`（および`nosniff`）を返す場合、CORBの保護機能が強制的に実行されたことを観察することができます。この保護機能を検出すると、攻撃者はステータスコード (成功 もしくは エラー) と `Content-Type` (CORBで保護されているかどうか) の両方の組み合わせをリークさせることができます。これにより、以下の例に示すように、2つの可能な状態を区別することができます。
+* 1番目の状態はリクエストがCORBによって保護され、2番目の状態では、クライアントエラー（404）となる。
+* 1番目の状態はCORBによって保護され、2番目の状態では保護されない。
 
-Attackers can observe when CORB is enforced if a response returns a *CORB protected* `Content-Type` (and `nosniff`) with the status code `2xx` which results in CORB stripping the body and headers from the response. Detecting this protection allows an attacker to leak the combination of both the status code (success vs. error) and the `Content-Type` (protected by CORB or not). This allows the distinction of two possible states as shown in these examples:
-- One state results in a request being protected by CORB and the second state in a client error (404).
-- One state is protected by CORB and the second state is not.
+以下の手順で、最初の例の文脈でこの保護機能を悪用することができます。
 
-The following steps allow abusing this protection in the context of the first example:
+1. 攻撃者は、`Content-Type`が`text/html`で`nosniff` ヘッダーが設定された`200 OK`のレスポンスを返すリソースを`script`タグに、クロスオリジンリソースとして埋め込むこみます。
+2. 機密性の高いコンテンツが攻撃者のプロセスに入るのを防ぐため、CORBは元のレスポンスを空のレスポンスに置き換えます。
+3. 空のレスポンスは有効なJavaScriptであるため、`onerror` イベントは発生せず、`onload` が代わりに発生します。
+4. 攻撃者は、1.と同様に2番目のリクエスト（2番目の状態に対応）をトリガーし、`200 OK` 以外のものを返します。このとき、`onerror` イベントが発生します。
 
-1. An attacker can embed a cross-origin resource in a `script` tag which returns `200 OK` with `text/html` as `Content-Type` and a `nosniff` Header.
-2. To protect sensitive contents from entering the attacker's process, `CORB` will replace the original response with an empty one.
-3. Since an empty response is valid JavaScript, the `onerror` event won't be fired, `onload` will fire instead.
-4. The attacker triggers a second request (corresponding to a second state), similar to 1., which returns something other than `200 OK`. The `onerror` event will fire.
+興味深い動作は、CORBがリクエストから有効なリソースを作成し、JavaScript以外を含む可能性がある（エラーを引き起こす）ことです。非CORB環境を考慮すると、1.と 4.の両方のリクエストがエラーを引き起こします。これは、これらの状況によって区別可能であるとしてXS-Leakを導入しています。
 
-The interesting behavior is that CORB creates a valid resource out of the request which could contain something other than JavaScript (causing an error). Considering a non-CORB environment, both 1. and 4. requests would trigger an error. This introduces an XS-Leak as these situations are now distinguishable.
+## `nosniff`ヘッダーの検出
 
-## Detecting the `nosniff` Header
+CORBは、リクエストに `nosniff` ヘッダーが存在する場合、攻撃者に検出されてしまう可能性があります。この問題は、CORBがこのヘッダーの存在と一部のスニッフィングアルゴリズムによってのみ強制的に実行されることに起因しています。以下の例では、2つの区別可能な状態を示しています。
 
-CORB can also allow attackers to detect when the `nosniff` header is present in the request. This problem originated due to the fact that CORB is only enforced depending on the presence of this header and some sniffing algorithms. The example below shows two distinguishable states:
+1. CORBは、リソースが`nosniff`ヘッダーと共に`Content-Type`が`text/html`で提供される場合、`script`として認識されたリソースを埋め込んだ攻撃者ページを防止します。
+2. リソースが`nosniff`を設定せず、CORBがページの `Content-Type`を[推測できない場合](https://chromium.googlesource.com/chromium/src/+/master/services/network/cross_origin_read_blocking_explainer.md#what-types-of-content-are-protected-by-corb)（`text/html`のまま）、コンテンツが有効なJavaScriptとして解析できないため`SyntaxError`が発生します。このエラーは、`script`タグが[特定の条件](https://developer.mozilla.org/en-US/docs/Web/API/HTMLScriptElement)下でのみエラーイベントをトリガーするため、`window.onerror` をリッスンすることで捕捉できます。
 
-1. CORB will prevent an attacker page which embeds a resource as a `script` if the resource is served with `text/html` as `Content-Type` along with the `nosniff` header.
-2. If the resource does not set `nosniff` and CORB [fails](https://chromium.googlesource.com/chromium/src/+/master/services/network/cross_origin_read_blocking_explainer.md#what-types-of-content-are-protected-by-corb) to infer the `Content-Type` of the page (which remains `text/html`), a `SyntaxError` will be fired since the contents can't be parsed as valid JavaScript. This error can be caught by listening to `window.onerror` as `script` tags only trigger error events under [certain conditions](https://developer.mozilla.org/en-US/docs/Web/API/HTMLScriptElement).
-
-## Defense
+## 対策
 
 
 | [SameSite Cookies (Lax)]({{< ref "/docs/defenses/opt-in/same-site-cookies.md" >}}) | [COOP]({{< ref "/docs/defenses/opt-in/coop.md" >}}) | [Framing Protections]({{< ref "/docs/defenses/opt-in/xfo.md" >}}) |                                          [Isolation Policies]({{< ref "/docs/defenses/isolation-policies" >}})                                          |
 | :--------------------------------------------------------------------------------: | :-------------------------------------------------: | :---------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------: |
 |                                         ✔️                                          |                          ❌                          |                                 ❌                                 | [RIP]({{< ref "/docs/defenses/isolation-policies/resource-isolation" >}}) 🔗 [NIP]({{< ref "/docs/defenses/isolation-policies/navigation-isolation" >}}) |
 
-🔗 – Defense mechanisms must be combined to be effective against different scenarios.
+🔗 – 異なるシナリオに対して有効な防御機構を組み合わせる必要があります。
 
 {{< hint tip >}}
-Developers can deploy [CORP]({{< ref "/docs/defenses/opt-in/corp.md" >}}) in an application's subresources to force a protection similar to CORB that does not inspect responses to decide when to act. To prevent attackers from abusing this XS-Leak, generic XS-Leaks defense mechanisms are also effective.
+開発者は、アプリケーションのサブリソースに[CORP]({{< ref "/docs/defenses/opt-in/corp.md" >}})を展開し、いつ動作するかを決定するためにレスポンスを検査しないCORBと同様の保護を強制することができます。攻撃者がこのXS-Leakを悪用するのを防ぐために、一般的なXS-Leakの防御メカニズムも有効です。
 {{< /hint >}}
 
-## References
+## 参考文献
 
 [^1]: CORB vs side channels, [link](https://docs.google.com/document/d/1kdqstoT1uH5JafGmRXrtKE4yVfjUVmXitjcvJ4tbBvM/edit?ts=5f2c8004)

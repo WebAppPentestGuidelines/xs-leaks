@@ -20,43 +20,42 @@ menu = "main"
 weight = 3
 +++
 
+`id`属性はHTML要素を識別するために広く利用されています。残念ながらクロスオリジンのウェブサイトで`focus`イベントと`URL`フラグメントを利用することによって、ページのどこに`id`属性が与えられているかを決定することができます。例えば、`https://example.com/foo#bar`が読み込まれると、ブラウザは`id="bar"`が与えられた要素までスクロールしようとします。これはクロスオリジンのサイトで定義したiframeで`https://example.com/foo#bar`を読み込むことによって検出することができます。もし、 `id="bar"` を持つ要素がある場合は、 `focus` イベントが発生します。 `focus` イベントもまた同じ目的で使用することができます[^1]。
 
-The `id` attribute is widely used to identify `HTML` elements. Unfortunately, cross-origin websites can determine whether a given `id` is set anywhere on a page by leveraging the `focus` event and `URL` fragments. If `https://example.com/foo#bar` is loaded, the browser attempts to scroll to the element with `id="bar"`. This can be detected cross-origin by loading `https://example.com/foo#bar` in an iframe; if there is an element with `id="bar"`, the `focus` event fires. The `blur` event can also be used for the same purpose [^1].
+いくつかのウェブアプリケーションは`focusable`要素に`id`属性を設定しており、ユーザ情報の開示につながります。これらの`id`属性には、ユーザに直接関連する機密情報やユーザの状態（アカウントの状態）に関連する情報を含めることができます。
 
-Some web applications set `id` attributes in `focusable` elements that can lead to disclosing user information. These `id`s can either contain information directly related to the user (e.g. a secret), or information associated with a user state (e.g. account status).
+## コード
 
-## Code snippet
-
-The below snippet presents an example of detecting the ID attribute from another site:
+以下のコードは別のサイトからID属性を検出する例を示しています：
 ```javascript
-// Listen to onblur event
+// onblurイベントをリッスン
 onblur = () => {
   alert('Focus was lost, so there is a focusable element with the specified ID');
 }
 var ifr = document.createElement('iframe');
-// If a page has a focusable element with id="x" it will gain focus
-// E.g. <input id="x" value="test" />
+// ページに id="x" のフォーカス可能な要素がある場合、フォーカスを得ることができます。
+// 例： <input id="x" value="test" />
 ifr.src = 'https://example.org/#x';
 document.body.appendChild(ifr);
 ```
 
 {{< hint info >}}
-The above technique doesn't seem to work in Firefox.
+上記の手法はFireFoxではうまく動作しない可能性があります。
 {{< /hint >}}
 
-## Case Scenarios
+## 攻撃シナリオ
 
-Some examples of `id`-attribute-based attacks are:
-- A bank allows its clients to generate short numeric One-Time PINs (OTP) in the browser application to authenticate sessions on mobile devices. The bank used the OTP as the `id` of a `button` that is used to show the PIN to the client. This approach could be abused to steal these OTP codes by brute-forcing every option and then using them to compromise user accounts.
-- A web application uses a specific set of predefined `ids` and `HTML` elements when an account has a premium status or the user is of a certain gender. The attacker can detect whether a specific `id` is present on the victim's page and leak the account information.
+`id`属性を利用した攻撃は以下のような物があります。
+- とある銀行がモバイルデバイスのセッションを認証するために短い数字のワンタイムPin(OTP)を生成することを許可しています。この銀行のページはクライアントにPINコードを表示するための`button`要素の`id`にOTPコードそのものを使用していました。この挙動を悪用し、すべてのオプションをブルートフォースすることでOTPコードを窃取し、ユーザアカウントを侵害することができます。
+- とあるウェブアプリケーションが、プレミアムアカウントのステータスを持つユーザや、特定の性別のユーザである場合、あらかじめ定義された`id`と`HTML`要素の組み合わせを利用します。攻撃者は、被害者のページに特定の`id`があるかを検出し、被害者のアカウント情報を漏えいさせることができます。
 
-## Defense
+## 対策
 
 | [Document Policies]({{< ref "/docs/defenses/opt-in/document-policies.md" >}}) | [SameSite Cookies (Lax)]({{< ref "/docs/defenses/opt-in/same-site-cookies.md" >}}) | [COOP]({{< ref "/docs/defenses/opt-in/coop.md" >}}) | [Framing Protections]({{< ref "/docs/defenses/opt-in/xfo.md" >}}) |                                          [Isolation Policies]({{< ref "/docs/defenses/isolation-policies" >}})                                          |
 | :--------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------: | :-------------------------------------------------: | :---------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------: |
 |                                         ✔️                                          |                                         ✔️                                          |                          ✔️                          |                                 ❌                                 | [FIP]({{< ref "/docs/defenses/isolation-policies/framing-isolation" >}}) |
 
 
-## References
+## 参考文献
 
 [^1]: Leaking IDs using focus, [link](https://portswigger.net/research/xs-leak-leaking-ids-using-focus)

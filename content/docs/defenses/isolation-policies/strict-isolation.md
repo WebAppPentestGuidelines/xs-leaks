@@ -8,66 +8,67 @@ category = [
 menu = "main"
 weight = 4
 +++
-Strict Isolation Policy is intended to protect against all cross-site interactions (including navigations to the application through hyperlinks). This is a very strict policy that has the potential to prevent applications from functioning properly.
+Strict Isolation Policyは、すべてのクロスサイトインタラクション（ハイパーリンクを介したアプリケーションへの遷移を含む）から保護することを目的としています。これは非常に厳しいポリシーであり、アプリケーションが正常に機能しなくなる可能性があります。
 
 {{< hint tip >}}
-Instead of rejecting all cross-site interactions, the user could be prompted to confirm the action, e.g. *Confirm that you visited this page from a trusted origin*, to mitigate the risk of attacks in the background, and, at the same time, help prevent unintended breakages of an application.
+すべてのクロスサイトインタラクションを拒否する代わりに、ユーザーにアクションを確認するよう促すことができます。例えば、*このページを信頼できる発信元から訪れたことを確認することで* 、バックグラウンドでの攻撃のリスクを軽減し、同時にアプリケーションの意図しない破壊を防ぐのに役立ちます。
 
-However, this would only work for navigational requests, since other resources are loaded in the background.
+しかし、他のリソースはバックグラウンドで読み込まれるため、これは遷移のリクエストに対してのみ機能します。
 {{< /hint >}}
 
 
-## Implementation with Fetch Metadata
+## Fetch Metadataを用いた実装
 
-The below snippet showcases an example implementation of Strict Isolation Policy by an application:
+以下のコードは、アプリケーションによる Strict Isolation Policy の実装例を示しています:
 
 ```py
-# Reject cross-origin requests to protect from CSRF, XSSI, and other bugs
+# クロスオリジンリクエストを拒否し、CSRFやXSSI、他のバグから保護します
 def allow_request(req):
-  # Allow requests from browsers which don't send Fetch Metadata
+  # Fetch Metadataを送信しないブラウザからのリクエストを許可する
   if not req['headers']['sec-fetch-site']:
     return True
 
-  # Block any cross-site request
+  # cross-siteリクエストをブロック
   if req['headers']['sec-fetch-site'] == 'cross-site':
     return False
 
-  # Allow all other requests
+  # その他のリクエストを許可する
   return True
 ```
 
-## Implementation with SameSite cookies
-If a server sends a cookie with the [`SameSite=strict`]({{< ref "../opt-in/same-site-cookies/#samesite-cookie-modes" >}}) flag, any returned request that doesn't contain that cookie can be rejected, as showcased in this snippet:
+## SameSite cookiesを用いた実装
+もしサーバーが[`SameSite=strict`]({{< ref "../opt-in/same-site-cookies/#samesite-cookie-modes" >}})フラグを持つCookieを送ると、このコードで示されるように、そのCokkieを含まないで返される全てのリクエストは拒否されることがあります。
 
 ```py
-# Reject cross-origin requests to protect from CSRF, XSSI, and other bugs
+# クロスオリジンリクエストを拒否し、CSRFやXSSI、他のバグから保護します
 def allow_request(req):
 
   if req['cookies']['strict-cookie'] == 'true':
     return True
 
-  # Block requests without a strict cookie
+  # strict Cookieを持たないリクエストはブロック
   return False
 ```
 
-## Implementation with Referer
-It is also possible to reject requests from untrusted origins with the [`Referer`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer) header:
+## Refererを用いた実装
+また、[`Referer`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer) ヘッダーを使用して、信頼できない送信元からのリクエストを拒否することも可能です:
 
 ```py
-# Reject requests that came from untrusted referrers
+# 信頼できないリファラーから来たリクエストを拒否する
 def allow_request(req):
 
-  # check if the referer header is trusted, i.e. exists in trusted_referers dict
+  # referer ヘッダが信頼できるかどうかを確認する。つまりtrusted_referers ディクショナリに存在するかどうかを確認する。
   if req['headers']['referer'] in trusted_referers:
     return True
 
-  # Block requests without a strict cookie
+  # strict Cookieを持たないリクエストをブロック
   return False
 ```
 
 {{< hint important >}}
-It is not guaranteed that every request will contain the Referer header (e.g. extensions can strip the header) which could potentially break an application. Also be aware that it is possible to set the value of `Referer` to `null`.
+すべてのリクエストに Referer ヘッダが含まれることは保証されていません (たとえば、拡張機能でヘッダを取り除くことができます)。また、`Referer` の値を `null` に設定することも可能であることに注意してください。
 
-Twitter deployed [^twitter_silhouette] a similar protection against XS-Leaks.
-[^twitter_silhouette]: Protecting user identity against Silhouette, [link](https://blog.twitter.com/engineering/en_us/topics/insights/2018/twitter_silhouette.html)
+Twitterは、XS-Leaksに対して同様の防御策を導入[^twitter_silhouette]しています。
+
+[^twitter_silhouette]: Silhouetteからユーザーアイデンティティを保護する, [link](https://blog.twitter.com/engineering/en_us/topics/insights/2018/twitter_silhouette.html)
 {{< /hint >}}

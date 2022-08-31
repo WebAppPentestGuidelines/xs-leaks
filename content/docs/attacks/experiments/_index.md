@@ -6,4 +6,4 @@ title: "Experiments"
 
 # Experiments
 
-This section presents XS-Leaks that affect experimental features. Experimental features are usually hidden under a browser preference flag and their exact specification is under active discussion. It's important to be aware of these features and follow their development from the early stages of implementation to prevent XS-Leaks from happening.
+このセクションでは、実験的な機能に影響を与えるXS-Leaksを紹介します。実験的な機能は、通常ブラウザの環境設定フラグの下に隠されており、その正確な仕様は活発に議論されている最中です。XS-Leaksを防ぐためには、これらの機能を認識し、実装の初期段階からその開発をフォローすることが重要です。

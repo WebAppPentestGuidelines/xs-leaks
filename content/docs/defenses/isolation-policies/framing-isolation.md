@@ -8,26 +8,26 @@ category = [
 menu = "main"
 weight = 2
 +++
-Framing Isolation Policy is a stricter version of [Framing Protections]({{< ref "../opt-in/xfo" >}}) where the request gets blocked at the application level rather than by the browser. This is designed to protect against various attacks (e.g. XSSI, CSRF, XS-Leaks) by blocking framing requests to endpoints that are not intended to be framable.
+Framing Isolation Policy は、[Framing Protections]({{< ref "../opt-in/xfo" >}}) のより厳格なバージョンで、ブラウザではなく、アプリケーションレベルでリクエストがブロックされます。これは、フレーム化を意図していないエンドポイントへのフレーム化リクエストをブロックすることで、さまざまな攻撃（XSSI、CSRF、XS-Leaksなど）から保護するために設計されています。
 
-It can be combined with [Resource Isolation Policy]({{< ref "resource-isolation.md" >}}) to effectively tighten the attack surface within cross-site information leaks.
+[Resource Isolation Policy]({{< ref "resource-isolation.md" >}}) と組み合わせることで、XS-Leaksの攻撃対象領域を効果的に絞り込むことができます。
 
 {{< hint tip >}}
-Instead of rejecting all non-framable endpoints, the user could be prompted to confirm the action, e.g. *Confirm that you visited this page from a trusted origin*, to mitigate the risk of attacks in the background, and, at the same time, help prevent unintended breakages of an application.
+フレーム化できないエンドポイントをすべて拒否するのではなく、例えば *信頼できる発信元からこのページを訪問したことを確認する* といったアクションを確認するようユーザーに促すことで、バックグラウンドでの攻撃のリスクを軽減し、同時にアプリケーションの意図しない破損を防ぐことができます。
 {{< /hint >}}
 
 {{< hint tip >}}
-When deployed together with [Resource Isolation Policy]({{< ref "resource-isolation.md" >}}), Framing Isolation Policy does not protect against leaks utilizing window references (e.g. `window.length`), so other navigational protections such as [COOP]({{< ref "../opt-in/coop" >}}) or [Navigation Isolation Policy]({{< ref "navigation-isolation" >}}) can be helpful.
+[Resource Isolation Policy]({{< ref "resource-isolation.md" >}}) と共に展開された場合、Framing Isolation Policy はウィンドウ参照（例 `window.length`）を利用したリークから保護しないため、[COOP]({{< ref "../opt-in/coop" >}}) や [Navigation Isolation Policy]({{< ref "navigation-isolation" >}}) など他の画面遷移保護が役に立つことがあります。
 {{< /hint >}}
 
-## Implementation with Fetch Metadata
+## Fetch Metadataを用いた実装
 
-The below snippet showcases an example implemention of the Framing Isolation Policy by an application:
+以下のコードは、アプリケーションによる Framing Isolation Policy の実装例を示しています。
 
 ```py
-# Reject cross-site requests to protect from CSRF, XSSI, XS-Leaks, and other bugs
+# CSRF、XSSI、XS-Leaksなどのバグから保護するために、クロスサイトリクエストを拒否します。
 def allow_request(req):
-  # Allow requests from browsers which don't send Fetch Metadata
+  # Fetch Metadataを送信しないブラウザからのリクエストを許可する。
   if not req['headers']['sec-fetch-site']:
     return True
   if not req['headers']['sec-fetch-mode']:
@@ -35,22 +35,21 @@ def allow_request(req):
   if not req['headers']['sec-fetch-dest']:
     return True
 
-  # Allow non-navigational requests
+  # 遷移以外のリクエストを許可する。
   if req['headers']['sec-fetch-mode'] not in ('navigate', 'nested-navigate'):
     return True
 
-  # Allow requests not originated from embeddable elements
+  # 遷移以外のリクエストを許可する。
   if req['headers']['sec-fetch-dest'] not in ('frame', 'iframe', 'embed', 'object'):
       return True
 
-  # [OPTIONAL] Exempt paths/endpoints meant to be served cross-site.
+  # [OPTIONAL] クロスサイトで提供されることを意図したパス/エンドポイントを除外する。
   if req.path in ('/my_frame_ancestors_host_src'):
     return True
 
-  # Reject all other requests
+  # 全ての他のリクエストを拒否する。
   return False
 ```
 
-## Considerations
-Framing Isolation Policy cannot be applied if an endpoint allows framing requests from specific origins via  `X-Frame-Options` and/or Content Security Policy's
-`frame-ancestors` directive.
+## 考慮事項
+エンドポイントが`X-Frame-Options` および/または Content Security Policy の `frame-ancestors` ディレクティブによって特定のオリジンからのフレーミングリクエストを許可する場合、Framing Isolation Policy を適用することはできません。
