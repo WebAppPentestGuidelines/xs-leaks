@@ -7,70 +7,77 @@ bookToc: false
 # XS-Leaks Wiki
 ## Overview
 
-Cross-site leaks (aka XS-Leaks, XSLeaks) are a class of vulnerabilities derived from side-channels [^side-channel] built into the web platform. They take advantage of the web's core principle of composability, which allows websites to interact with each other, and abuse legitimate mechanisms [^browser-features] to infer information about the user. One way of looking at XS-Leaks is to highlight their similarity with cross-site request forgery (CSRF [^csrf]) techniques, with the main difference being that instead of allowing other websites to perform actions on behalf of a user, XS-Leaks can be used to infer information about a user. 
+Cross-site leaks (別名 XS-Leaks、XSLeaks) は、Web プラットフォームに組み込まれたサイドチャネル [^side-channel] に由来する脆弱性分類です。 それらは、Web サイトが相互にやり取りできるようにするという Web のコア原則を利用し、正当なメカニズム [^browser-features] を悪用してユーザーに関する情報を推測します。 XS-Leaks の見方として、クロスサイトリクエストフォージェリ (CSRF [^csrf]) 技術との類似性を強調する方法があります。XS-Leaksは、他の Web サイトがユーザーに代わってアクションを実行するのではなく、ユーザーに関する情報を推測するために使用されます。
 
-Browsers provide a wide variety of features to support interactions between different web applications; for example, they permit a website to load subresources, navigate, or send messages to another application. While such behaviors are generally constrained by security mechanisms built into the web platform (e.g. the [same-origin policy](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy)), XS-Leaks take advantage of small pieces of information which are exposed during interactions between websites. 
+例えばブラウザは、ウェブサイトが、サブリソースをロードしたり、ナビゲートしたり、他のアプリケーションにメッセージを送信することを可能にします。このような動作は、一般的にウェブプラットフォームに組み込まれたセキュリティメカニズム（例えば、[same-origin policy]（https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy））によって制限されますが、XS-Leaksはウェブサイト間の相互作用中に露出する小さな情報の断片を利用します。
 
-The principle of an XS-Leak is to use such side-channels available on the web to reveal sensitive information about users, such as their data in other web applications, details about their local environment, or internal networks they are connected to.
+XS-Leaksの原理は、ウェブ上で利用可能なこのようなサイドチャネルを利用して、他のウェブアプリケーション内のデータ、ローカル環境の詳細、接続されている内部ネットワークなど、ユーザーの機密情報を明らかにすることです。
 
-## Cross-site oracles
+## Cross-site オラクル
 
-The pieces of information used for an XS-Leak usually have a binary form and are referred to as "oracles". Oracles generally answer with *YES* or *NO* to cleverly prepared questions in a way that is visible to an attacker. For example, an oracle can be asked:
+XS-Leakに使用される情報の断片は、通常バイナリ形式を持ち、「オラクル」と呼ばれます。
+オラクルは一般的に、攻撃者から見える形で巧妙に用意された質問に対して*YES*または*NO*で答えます。
 
-> Does the word *secret* appear in the user's search results in another web application?
+例えば、オラクルは次のように問われることがあります。
 
-This question might be equivalent to asking:
+> 他のウェブアプリケーションでユーザーの検索結果に*secret*という単語が表示されるか？
 
-> Does the query *?query=secret* return an *HTTP 200* status code?
+これは、という問いかけに等しいかもしれません:
 
-Since it is possible to detect the *HTTP 200* status code with [Error Events]({{< ref "./docs/attacks/error-events.md" >}}), this has the same effect as asking:
+> クエリ *?query=secret* は *HTTP 200* ステータスコードを返すか？
 
-> Does loading a resource from *?query=secret* in the application trigger the *onload* event?
+また、[Error Events]({{< ref "./docs/attacks/error-events.md" >}})で*HTTP 200*のステータスコードを検出することができるため、この問い合わせと同じ効果となります:
 
-The above query could be repeated by an attacker for many different keywords, and as a result the answers could be used to infer sensitive information about the user's data.
+> アプリケーションで *?query=secret* からリソースを読み込むと、*onload* イベントが発生するか？
 
-Browsers provide a wide range of different APIs that, while well-intended, can end up leaking small amounts of cross-origin information. They are described in detail throughout this wiki.
+上記のクエリーは、攻撃者によって多くの異なるキーワードで繰り返される可能性があり、その結果、ユーザーのデータに関する機密情報を推測するためにレスポンスが使用される可能性があります。
+
+ブラウザは、善意でありながら、少量のクロスオリジン情報を漏らしてしまう可能性のある、さまざまなAPIを幅広く提供しています。
+これらのAPIについては、このWikiの中で詳しく説明します。
 
 ## Example
 
-Websites are not allowed to directly access data on other websites, but they can load resources from them and observe the side effects. For example, *evil.com* is forbidden from explicitly reading a response from *bank.com*, but *evil.com* can attempt to load a script from *bank.com* and determine whether or not it successfully loaded.
+ウェブサイトは、他のウェブサイトのデータに直接アクセスすることはできませんが、他のウェブサイトからリソースをロードし、その副作用を観察することは可能です。たとえば、*evil.com*は*bank.com*からの応答を明示的に読むことを禁じられていますが、*evil.com*は*bank.com*からスクリプトをロードしようと試み、それがうまくロードされたかどうかを判断することができます。
 
 {{< hint example >}}
 
-Suppose that *bank.com* has an API endpoint that returns data about a user's receipt for a given type of transaction.
+例えば、*bank.com* が、ある種の取引におけるユーザーの領収書に関するデータを返す API エンドポイントを持っているとする。
 
-1. *evil.com* can attempt to load the URL *bank.com/my_receipt?q=groceries* as a script. By default, the browser attaches cookies when loading resources, so the request to *bank.com* will carry the user's credentials.
-2. If the user has recently bought groceries, the script loads successfully with an *HTTP 200* status code. If the user hasn't bought groceries, the request fails to load with an *HTTP 404* status code, which triggers an [Error Event]({{< ref "./docs/attacks/error-events.md" >}}).
-3. By listening to the error event and repeating this approach with different queries, the attacker can infer a significant amount of information about the user's transaction history.
+1. *evil.com*は、スクリプトとしてURL *bank.com/my_receipt?q=groceries*をロードしようとすることができます。デフォルトでは、ブラウザはリソースをロードする際にクッキーを添付するので、*bank.com*へのリクエストはユーザーのクレデンシャルを運ぶことになります。
+2. ユーザーが最近食料品を購入した場合、スクリプトは *HTTP 200* ステータスコードで正常にロードされます。ユーザーが食料品を購入していない場合、リクエストはHTTP 404*ステータスコードでロードに失敗し、[エラーイベント]({{< ref "./docs/attacks/error-events.md" >}})がトリガーされます。
+3. エラーイベントをリスニングし、異なるクエリでこのアプローチを繰り返すことで、攻撃者はユーザーの取引履歴に関するかなりの量の情報を推論することができます。
 {{< /hint >}}
 
-In the example above, two websites of two different origins (*evil.com* and *bank.com*) interacted through an API that browsers allow websites to use.  This interaction didn't exploit any vulnerabilities in the browser or in *bank.com*, but it still allowed *evil.com* to gain information about the user's data on *bank.com*.  
+上記の例では、2つの異なるオリジンのウェブサイト（*evil.com* と *bank.com* ）が、ブラウザがウェブサイトの使用を許可している API を介して、相互に作用しています。 この相互作用は、ブラウザや*bank.com*の脆弱性を悪用するものではありませんでしたが、*evil.com*が*bank.com*上のユーザーのデータに関する情報を取得することを可能にしました。  
 
+## XS-Leaksの根本的な原因
 
+ほとんどのXS-Leaksの根本原因は、ウェブのデザインに内在するものです。多くの場合、アプリケーションは何も間違っていないのに、XS-Leaksによる情報漏洩の危険にさらされています。XS-Leaksの根本的な原因をブラウザレベルで修正することは、多くの場合、既存のウェブサイトを壊してしまうため困難です。このため、ブラウザは様々な防御機構({{< ref "defenses" >}})を実装し、この困難を克服しています。これらの防御の多くは、通常、特定の HTTP ヘッダ (例: *[Cross-Origin-Opener-Policy]({{< ref "./docs/defenses/opt-in/coop.md">}}): same-origin*) を使うことによって、より厳しいセキュリティモデルを選ぶようウェブサイトに要求していますが、望ましい結果を得るためにはしばしば組み合わせる必要があります。
 
-## Root cause of XS-Leaks
+XS-Leaksの情報源は、以下のように区別することができます：
 
-The root cause of most XS-Leaks is inherent to the design of the web. Oftentimes applications are vulnerable to some cross-site information leaks without having done anything wrong. It is challenging to fix the root cause of XS-Leaks at the browser level because in many cases doing so would break existing websites. For this reason, browsers are now implementing various [Defense Mechanisms]({{< ref "defenses" >}}) to overcome these difficulties. Many of these defenses require websites to opt in to a more restrictive security model, usually through the use of certain HTTP headers (e.g. *[Cross-Origin-Opener-Policy]({{< ref "./docs/defenses/opt-in/coop.md">}}): same-origin*), which often must be combined to achieve the desired outcome.
+1. ブラウザAPI (例： [Frame Counting]({{< ref "frame-counting.md" >}}) と [Timing Attacks]({{< ref "timing-attacks.md" >}}))
+2. ブラウザの細かい実装とバグ (例：　[Connection Pooling]({{< ref "./docs/attacks/timing-attacks/connection-pool.md" >}}) や [typeMustMatch]({{< ref "./docs/attacks/historical/content-type.md#typemustmatch" >}}))
+3. ハードウェアのバグ(例： Speculative Execution Attacks [^spectre])
 
-We can distinguish different sources of XS-Leaks, such as:
+## ちょっとした歴史
 
-1. Browser APIs (e.g. [Frame Counting]({{< ref "frame-counting.md" >}}) and [Timing Attacks]({{< ref "timing-attacks.md" >}}))
-2. Browser implementation details and bugs (e.g. [Connection Pooling]({{< ref "./docs/attacks/timing-attacks/connection-pool.md" >}}) and [typeMustMatch]({{< ref "./docs/attacks/historical/content-type.md#typemustmatch" >}}))
-3. Hardware bugs (e.g. Speculative Execution Attacks [^spectre])
+XS-Leaksは長い間ウェブプラットフォームの一部でした。ユーザーのウェブ活動に関する情報を漏らす[タイミング攻撃]({{< ref "network-timing.md" >}})は少なくとも [2000](https://dl.acm.org/doi/10.1145/352600.352606)年には知られていました。
 
-## A little bit of history
+このクラスの問題は、その影響力を高める新しいテクニックが発見されるにつれて、着実に注目を集めるようになりました[^old-wiki]。
+2015年、GelernterとHerzbergは「Cross-Site Search Attacks」[^xs-search-first]を発表し、タイミング攻撃を悪用して、GoogleとMicrosoftが構築したWebアプリケーションに対して影響力の大きいXS-Search攻撃を実装しました。それ以来、さらに多くの XS-Leak テクニックが発見され、テストされています。
 
-XS-Leaks have long been part of the web platform;  [timing attacks]({{< ref "network-timing.md" >}}) to leak information about the user's web activity have been known since at least [2000](https://dl.acm.org/doi/10.1145/352600.352606).
+近年、ブラウザは様々な新しい[防御機構]({{< ref "defenses" >}}) を実装して、アプリケーションを XS-Leaks からより簡単に保護できるようにしました。
 
-This class of issues has steadily attracted more attention [^old-wiki] as new techniques were found to increase their impact. In 2015, Gelernter and Herzberg published "Cross-Site Search Attacks" [^xs-search-first] which covered their work on exploiting timing attacks to implement high impact XS-Search attacks against web applications built by Google and Microsoft. Since then, more XS-Leak techniques have been discovered and tested.
+## このWikiについて
 
-Recently, browsers have implemented a variety of new [defense mechanisms]({{< ref "defenses" >}}) that make it easier to protect applications from XS-Leaks.
+この wiki は、読者に XS-Leaks を紹介することと、XS-Leaks を悪用する経験豊富な研究者のためのリファレンス ガイドとして機能することの両方を目的としています。 この wiki にはさまざまな手法に関する情報が含まれていますが、新しい手法は常に出現しています。
+ 新しいテクニックを追加するか、既存のページを拡張するかに関係なく、改善は常に高く評価されます!
 
-## About this wiki
+このウィキに貢献する方法を見つけて、 [Contributions]({{< ref "contributions.md" >}}) の記事で貢献者のリストを参照してください。
 
-This wiki is meant to both introduce readers to XS-Leaks and serve as a reference guide for experienced researchers exploiting XS-Leaks. While this wiki contains information on many different techniques, new techniques are always emerging. Improvements, whether they add new techniques or expand existing pages, are always appreciated!
+※なお、和訳版についての要望やコミットは別途Issue等にて受け付けます。
 
-Find out how you can contribute to this wiki and view the list of contributors in the [Contributions]({{< ref "contributions.md" >}}) article.
 
 ## References
 [^side-channel]: Side Channel Vulnerabilities on the Web - Detection and Prevention, [link](https://owasp.org/www-pdf-archive/Side_Channel_Vulnerabilities.pdf)

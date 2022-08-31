@@ -5,9 +5,9 @@ weight: 100
 
 # Historical Attacks
 
-The articles in this section present XS-Leaks that have been addressed within browsers and no longer work. Different mitigation strategies were applied, such as:
+このセクションの記事では、ブラウザー内で対処されて機能しなくなった XS-Leak について説明します。 次のようなさまざまな緩和戦略が適用されました。
 
-- Reducing the accuracy of some powerful APIs.
-- Adding noise to a certain measurement to prevent any malicious inference from it.
-- Deprecating and removing features and APIs.
-- Changing the feature's behavior.
+- 一部の強力な API の精度を低下させる
+- 特定の測定値にノイズを追加して、悪意のある推論を防止
+- 機能と API の廃止と削除
+- 機能の動作を変更
