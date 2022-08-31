@@ -15,15 +15,15 @@ defenses = [
 menu = "main"
 +++
 
-Leaking the Content-Type of a request would provide attackers with a new way of distinguishing two requests from each other.
+リクエストのContent-Typeをリークすることで、攻撃者は2つのリクエストを区別できるようになります。
 
 ## typeMustMatch
 
-[`typeMustMatch`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLObjectElement/typeMustMatch) is a Boolean that reflects the `typeMustMatch` attribute of the `object` element. It ensures that a certain MIME type must be enforced when loading an object, by verifying if the `Content-Type` of the resource is the same as the one provided in the object. Unfortunately, this enforcement also allowed attackers to leak the `Content-Type` and Status Codes returned by a website [^1].
+[`typeMustMatch`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLObjectElement/typeMustMatch)は`object`要素の`typeMustMatch`属性を反映したブール値です。これは、オブジェクトを読み込む際に、リソースの`Content-Type`がオブジェクトで提供されるものと同じかどうかを検証することで、特定の MIME タイプを強制しなければならないことを保証します。残念ながら、この強制は攻撃者がウェブサイトから返される`Content-Type`とステータスコードを漏らすことも可能にします [^1]。
 
-### Root Cause
+### 根本的な原因
 
-Considering the snippet below, `not_loaded` would be rendered if the returned `Content-Type` of `https://target/api` did not match the one in `type`, or if the server returned a status different than `200`.
+以下のスニペットを考えると、`https://target/api` で返された `Content-Type` が `type` のものと一致しない場合や、サーバが `200` 以外のステータスを返した場合には、 `not_loaded` がレンダリングされるでしょう。
 
 ```html
 <object type="application/json"
@@ -32,39 +32,39 @@ Considering the snippet below, `not_loaded` would be rendered if the returned `C
 not_loaded </object>
 ```
 
-#### Issues
+#### 問題
 
-An attacker could leak the `Content-Type` and Status Codes of a website by detecting whether the object rendered, which happens when [all conditions]({{< ref "#root-cause" >}}) are met. The attacker could check the values of `clientHeight` and `clientWidth` which are likely to be different than 0 when the object renders (and returns status `200`). Since `typeMustMatch` requires the server to return status `200` to load a resource, it would be possible to detect error pages, similar to [Error Events]({{< ref "../error-events.md" >}}) XS-Leaks.
+攻撃者は、[すべての条件]({{< ref "#root-cause" >}})が満たされたときに起こるオブジェクトのレンダリングを検出することによって、ウェブサイトの`Content-Type`とステータスコードをリークできます。攻撃者は、(ステータスコード`200`で)オブジェクトがレンダリングされるとき、0ではないであろう`clientHeight`と`clientWidth`の値をチェックできます。`typeMustMatch`はリソースを読み込む際に、サーバーがステータス`200`を返すことを要求するので、[Error Events]({{< ref "../error-events.md" >}}) XS-Leaksと同様にエラーページを検出することが可能でしょう。
 
-The example below shows how this behavior could be detected by embedding an object inside an `iframe` and checking the values of `clientHeight` and `clientWidth` when the `iframe` triggers the `onload` event.
+以下の例では、`iframe`内にオブジェクトを埋め込み、`iframe`が`onload`イベントをトリガーしたときに`clientHeight`と`clientWidth`の値をチェックすることでこの動作を検出する方法を示しています。
 
 
 ```javascript
-// Set the destination URL
+// 配送先のWebサイトのURLを設定する
 var url = 'https://example.org';
-// The content type we want to check for
+// チェックしたいコンテンツタイプ
 var mime = 'application/json';
 var ifr = document.createElement('iframe');
-// Load an object inside iframe since object does not trigger onload event
+// オブジェクトがonloadイベントを発生させないので、iframe内にオブジェクトをロードする。
 ifr.srcdoc = `
   <object id="obj" type="${mime}" data="${url}" typemustmatch>
     error
   </object>`;
 document.body.appendChild(ifr);
 
-// When the iframe loads, read the height of the object. If it is the height 
-// of a single line of text, then the content type of the resource was not 
-// `application/json`. If it is a different height, then it was `application/json`. 
+// iframeが読み込まれたら、オブジェクトの高さを読み取ります。
+// もしそれが一行のテキストの高さであれば、リソースのContent Typeは`application/json`ではなかったということです。
+// もしそうでなければ、それは`application/json`だったということです。
 ifr.onload = () => {
     console.log(ifr.contentWindow.obj.clientHeight)
 };
 ```
 
-### Fix
+### 修正
 
-Firefox was the only browser that supported the `typeMustMatch` attribute [^2], and since no other browsers offered support, it was removed in version 68 and from the HTML Living Standard.
+Firefox は `typeMustMatch` 属性をサポートする唯一のブラウザでした [^2] が、他のブラウザがサポートを提供しなかったため、バージョン 68で削除され、HTML Living Standard からも削除されました。
 
-## References
+## 参考文献
 
 [^1]: Cross-Site Content and Status Types Leakage, [link](https://medium.com/bugbountywriteup/cross-site-content-and-status-types-leakage-ef2dab0a492)
 [^2]: Remove support for typemustmatch, [link](https://bugzilla.mozilla.org/show_bug.cgi?id=1548773)

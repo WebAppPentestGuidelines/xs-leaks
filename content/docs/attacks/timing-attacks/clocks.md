@@ -7,17 +7,18 @@ menu = "main"
 weight = 1
 +++
 
-We can distinguish two types of clocks – explicit and implicit. Explicit clocks are used by developers to get direct timing measurements, mechanisms of this type are offered explicitly by the browser. In contrast, implicit clocks utilize particular web features to create unintended clocks that allow measuring the relative passage of time.
+クロックには、明示的なものと暗黙的なものの2種類があります。
+明示的なクロックは、開発者が直接タイミングを測定するために使用されるもので、その機構はブラウザによって明示的に提供されます。
+一方で、暗黙的なクロックは、特定のWebの機能を利用して作り出される想定外のもので、それを利用することで相対的な時間経過を測定できるものです。
 
-
-## Explicit Clocks
+## 明示的なクロック
 
 ### performance.now API
 
-The [performance.now()](https://developer.mozilla.org/en-US/docs/Web/API/Performance/now) API allows developers to get high-resolution timing measurements.
+[performance.now()](https://developer.mozilla.org/en-US/docs/Web/API/Performance/now) APIは、開発者がより高精度に時間を計測することを可能にします。
 
 {{< hint info >}}
-In order to mitigate some types of XS-Leaks, `performance.now()`'s accuracy was reduced from a range of nanoseconds to microsecond precision in all modern browsers [^1] [^2] [^3].
+XS-Leaksのいくつかのタイプを緩和するため、`performance.now()`の精度は、すべてのモダンブラウザでナノ秒からマイクロ秒の範囲に縮小されました。[^1][^2][^3]
 <!-- TODO: "to mitigate some" means Size XS-Leaks that were fixed -->
 
 [^1]: Reduce resolution of performance.now (Webkit). [link](https://bugs.webkit.org/show_bug.cgi?id=146531)
@@ -27,19 +28,23 @@ In order to mitigate some types of XS-Leaks, `performance.now()`'s accuracy was 
 
 ### Date API
 
-The [Date](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date) API is the oldest API present in browsers which can be used to obtain timing measurements. It allows developers to get dates, and get Unix timestamps with `Date.now()`. These measurements are much less precise than [performance.now()](https://developer.mozilla.org/en-US/docs/Web/API/Performance/now). Before the introduction of newer APIs, attacks used to leverage this API [^3].
+[Date] APIは、タイミング測定に使用できる最も古いブラウザのAPIです。
+これにより開発者は日付を取得したり、`Date.now()`を使ってUnixタイムスタンプを取得したりすることができます。
+より新しいAPIが導入される前は、このAPIが攻撃に使われていました。[^3]
 
+## 暗黙的なクロック
 
-## Implicit Clocks
+### SharedArrayBufferとWeb Workers
 
-### SharedArrayBuffer and Web Workers
-
-With the introduction of `Web Workers`, new mechanisms to exchange data between threads were created [^1]. One of those mechanisms is `SharedArrayBuffer` which provides memory sharing between the main thread and a worker thread. A malicious website can create an implicit clock by loading a worker running an infinite loop that increments a number in the buffer. This value can then be accessed by the main thread at any time to read how many incrementations were performed.
+`Web Workers`の導入に伴い、スレッド間でデータを交換するための新しいメカニズムが作られました。[^1]それらの機構の一つが`SharedArrayBuffer`で、メインスレッドとワーカスレッドの間でメモリ共有を提供します。悪意のあるウェブサイトは、バッファ内の数値をインクリメントさせる無限ループを実効するワーカーをロードすることで、implicit クロックを作成することができます。この値は、メインスレッドからいつでもアクセスでき、何回インクリメントが行われたかを読み取ることができる。
 
 {{< hint info >}}
-`SharedArrayBuffer` was removed from browsers with the publication of [Spectre](https://spectreattack.com/). It was reintroduced later in 2020, requiring documents to be in a [secure context](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer) to make use of the API. Since secure contexts cannot reference any cross-origin content that has not explicitly opted in to being accessed, this means SharedArrayBuffers cannot be used as clocks for some XS-Leaks.
+[Spectre](https://spectreattack.com)の公開に伴い、`SharedArrayBuffer`はブラウザから削除されました。
+その後、2020年に再導入され、このAPIを利用する際はドキュメントが[セキュアコンテキスト](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer)内にあることが要求されるようになりました。
+セキュアコンテキストは、アクセスすることを明示的にオプトインしていないクロスオリジンコンテンツは参照できないので、これはSharedArrayBufferがいくつかのXS-Leakにおいてはクロックとして使用できないことを意味します。
 
-To make use of `SharedArrayBuffer` in modern browsers, an application needs to explicitly opt in to [COOP]({{< ref "../../defenses/opt-in/coop.md" >}}) and [COEP](https://web.dev/coop-coep/) by setting the following headers:
+モダンブラウザで`SharedArrayBuffer`を使用するには、アプリケーションは以下のヘッダを設定することで、明示的に[COOP]({{< ref "../../defenses/opt-in/coop.md" >}})や[COEP](https://web.dev/coop-coep/)を有効にする必要があります。
+
 ```http
 Cross-Origin-Opener-Policy: same-origin
 Cross-Origin-Embedder-Policy: require-corp
@@ -48,13 +53,13 @@ Cross-Origin-Embedder-Policy: require-corp
 
 
 ```javascript
-// Define a function to be ran inside a WebWorker
+// WebWorker内部で実行する関数を定義する
 function worker_function() {
   self.onmessage = function (event) {
     const sharedBuffer = event.data;
     const sharedArray = new Uint32Array(sharedBuffer);
 
-    // Infinitely increase the uint32 number
+	// uint32の数値を無限に増加増加させる
     while (true) Atomics.add(sharedArray, 0, 1);
   };
 }
@@ -67,14 +72,14 @@ const worker = new Worker(
     }))
 );
 
-// Create a Shared buffer between the WebWorker and a document
+// WebWorkerとドキュメント間のShared bufferを作成する
 const sharedBuffer = new SharedArrayBuffer(Uint32Array.BYTES_PER_ELEMENT);
 const sharedArray = new Uint32Array(sharedBuffer);
 worker.postMessage(sharedBuffer);
 ```
 
 {{< hint tip >}}
-To get the relative time in a main thread, you can use the [Atomics API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Atomics).
+メインスレッドでの相対時間を取得するには、[Atomics API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Atomics)を利用する。
 ```javascript
 Atomics.load(sharedArray, 0);
 ```
@@ -82,11 +87,12 @@ Atomics.load(sharedArray, 0);
 {{< /hint >}}
 
 
-### Other Clocks
+### その他のクロック
 
-There are a considerable number of APIs attackers can abuse to create implicit clocks: [Broadcast Channel API](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API), [Message Channel API](https://developer.mozilla.org/en-US/docs/Web/API/MessageChannel), [requestAnimationFrame](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame), [setTimeout](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout), CSS animations, and others [^2] [^4].
+攻撃者が暗黙的なクロックを作り出すために悪用できるAPIは、相当数存在します。：
+[Broadcast Channel API](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API)、[Message Channel API](https://developer.mozilla.org/en-US/docs/Web/API/MessageChannel)、[requestAnimationFrame](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame)、[setTimeout](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout)、CSSアニメーション、その他[^2] [^4].
 
-## References
+## 参考文献
 
 [^1]: Shared memory: Side-channel information leaks, [link](https://github.com/tc39/ecmascript_sharedmem/blob/master/issues/TimingAttack.md)
 [^2]: Fantastic Timers and Where to Find Them: High-Resolution Microarchitectural Attacks in JavaScript, [link](https://gruss.cc/files/fantastictimers.pdf)

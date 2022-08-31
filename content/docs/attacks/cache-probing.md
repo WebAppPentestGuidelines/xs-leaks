@@ -18,58 +18,59 @@ menu = "main"
 weight = 2
 +++
 
-The principle of Cache Probing consists of detecting whether a resource was cached by the browser. The concept has been known since the beginning of the web [^4] and initially relied on detecting timing differences.
+ Cache Probingは、あるリソースがブラウザによってキャッシュされているかどうかを検知する手法です。そのコンセプトは、初期のWeb[^4]から知られており、当初はタイミングの差異を検知することに基づいていました。
 
-When a user visits a website, some resources such as images, scripts, and HTML content are fetched and later cached by the browser (under certain conditions). This optimization  makes future navigations faster as the browser serves those resources from disk instead of requesting them again. If an attacker can detect which resources are cached, this information can be enough to leak whether a user accessed a specific page in the past.
+ユーザがWebサイトに訪れると、画像、スクリプト、そしてHTMLコンテンツなどの様々なリソースが取得され、それらは(特定の条件下で)ブラウザによってキャッシュされます。この最適化により、ブラウザはこれらのリソースを再度要求することなくディスクから提供するため、その後のナビゲーションが高速化されます。もし攻撃者がどのリソースがキャッシュされているかを検知できれば、この情報を基に、ユーザが特定のページにアクセスしたことがあるかどうかをリークできます。
 
-A variation of Cache Probing abuses [Error Events]({{< ref "../attacks/error-events.md" >}}) to perform more accurate and impactful attacks.
+Cache Probingのバリエーションとして、[Error Events]({{< ref "../attacks/error-events.md" >}})を悪用することにより、より正確でインパクトのある攻撃を実行することができます。
 
-## Attack Principle
+## 攻撃の原理
 
-An attacker wants to know whether a user visited a certain social network:
+攻撃者は、あるユーザーがあるSNSを訪問したかどうかを知りたいと考えています。
 
-1. When the user visits the social network some of the subresources are cached.
-2. The user visits an attacker-controlled page which fetches a resource that is usually fetched by the social network.
-3. Using a [Network Timing XS-Leak]({{< ref "../attacks/timing-attacks/network-timing.md" >}}), the attacker page can detect the difference between a response coming from the cache (i.e. step 1 occurred) or coming from the network (i.e. step 1 did not occur): the delay is significantly lower if a request is served from the cache.
+1. そのSNSにアクセスすると、いくつかのサブリソースがキャッシュされます。
+2. ユーザが、SNSが通常取得するリソースを取得する攻撃者のページを訪問する。
+3. [Network Timing XS-Leak]({{< ref "../attacks/timing-attacks/network-timing.md" >}})の手法を用いて、攻撃者のページはキャッシュからの応答（つまりステップ1が起こった）とネットワークからの応答（つまりステップ1が起こらなかった）の違いを検出することができます。（応答がキャッシュからの場合、遅延は顕著に短くなります。）
 
-## Cache Probing with Error Events
+## Error EventsによるCache Probing
 
-Cache Probing with [Error Events]({{< ref "../attacks/error-events.md" >}}) [^2] allows more accurate attacks. Instead of relying on timing measurements, this approach leverages [Error Events]({{< ref "../attacks/error-events.md" >}}) and some server-side behavior to detect whether a resource was cached. The attack requires the following steps:
+[Error Events]({{< ref "../attacks/error-events.md" >}})[^2]を利用したキャッシュプロービングは、より正確な攻撃を可能にします。このアプローチでは、時間の計測に頼らず、[Error Events]({{< ref "../attacks/error-events.md" >}})といくつかのサーバサイドの挙動を活用して、あるリソースがキャッシュされたかどうかを検出します。この攻撃は、以下のステップを必要とします。
 
-1. [Invalidating the resource]({{< ref "#invalidating-the-cache" >}}) from the browser cache. This step is required to make sure the attack does not consider a resource previously cached in another visit.
-2. Performing a request that causes different items to be cached depending on the user's state. For example, loading a page that includes a specific image only if the user is logged in. This request can be triggered by navigating to the target website with `<link rel=prerender..`, embedding the website in an `iframe`, or opening a new window with `window.open`.
-3. Triggering a request that causes the server to reject the request. For example, including an [overlong referer header](https://lists.archive.carbon60.com/apache/users/316239) that  makes the server reject the request. If the resource was cached in step 2, this request succeeds instead of triggering an error event.
+1. [ブラウザキャッシュ]({{< ref "#invalidating-the-cache" >}})からのリソースを無効化する。このステップは、攻撃が別の訪問で以前にキャッシュされたリソースを考慮しないことを確認するために必要です。
+2. ユーザーの状態によって異なる項目がキャッシュされるようなリクエストを実行する。例えば、ユーザーがログインしている場合にのみ、特定の画像を含むページをロードする。このリクエストは、`<link rel=prerender...`で対象のウェブサイトに移動したり、`iframe`でウェブサイトを埋め込んだり、`window.open`で新しいウィンドウを開くことで発生させることができる。
+3. サーバが拒否するようなリクエストを引き起こす。例えば、[長大なRefererヘッダ](https://lists.archive.carbon60.com/apache/users/316239)を含んでいて、サーバーがリクエストを拒否するような場合です。もし、ステップ2でリソースがキャッシュされていれば、このリクエストはエラーイベントを発生させることなく、成功します。
 
-### Invalidating the cache
+### キャッシュの無効化
+キャッシュからのリソースを無効にするには、攻撃者はそのサブリソースを取得する際にサーバーがエラーを返すようにする必要があります。これを実現するには、いくつかの方法があります。
 
-To invalidate a resource from the cache, the attacker must force the server to return an error when fetching that subresource. There are a couple of ways to achieve this:
+- ブラウザによってリクエストが開始され、新しいコンテンツを受け取る前に`AbortController.abort()`で中止された `cache:'reload'`オプション付きのフェッチリクエスト
+- [長大なRefererヘッダ](https://lists.archive.carbon60.com/apache/users/31623)と `'cache':'reload'`を持つリクエスト。ブラウザはこれを防ぐためにリファラの長さに[上限を設けている](https://github.com/whatwg/fetch/issues/903)ので、これはうまくいかないかもしれません。
+- `POST`リクエストに `fetch` `no-cors` を指定した場合。エラーが返されない場合でも、ブラウザがキャッシュを無効化することがあります。
+- Content-Type、Accept、Accept-Languageなど、サーバーを失敗させる可能性のあるリクエストヘッダ。（よりアプリケーションに依存します）
+- その他のリクエストプロパティ
 
-- A fetch request with a `cache:'reload'`option that is aborted with [`AbortController.abort()`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort) before new content has been received, but after the request was initiated by the browser.
-- A request with an [overlong referer header](https://lists.archive.carbon60.com/apache/users/316239) and `'cache':'reload'`. This might not work as browsers [capped](https://github.com/whatwg/fetch/issues/903) the length of the referrer to prevent this.
-- A `POST` request with a `fetch` `no-cors`. Sometimes, even in cases where an error is not returned, the browser invalidates the cache.
-- Request headers such as Content-Type, Accept, Accept-Language, etc. that may cause the server to fail (more application dependent).
-- Other request properties.
+これらの方法のいくつかは、しばしばブラウザのバグとみなされていそうです。(例: [this bug](https://bugs.chromium.org/p/chromium/issues/detail?id=959789#c9)).
 
-Often, some of these methods might be considered a bug in the browser (e.g. [this bug](https://bugs.chromium.org/p/chromium/issues/detail?id=959789#c9)).
+## Origin ReflectionによるCORS error
 
-## CORS error on Origin Reflection misconfiguration
-
-Origin reflection is a behavior in which a globally accessible resource is provided with a [Access-Control-Allow-Orign (ACAO)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin) header whose value reflects the origin that initialized the request. This can be considered as CORS misconfiguration [^5] and can be used to detect whether the resource exists in the browser cache.
+Origin Reflectionは、グローバルにアクセス可能なリソースに、リクエストを初期化したオリジンを反映した[Access-Control-Allow-Origin（ACAO）](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin)ヘッダを付与する挙動のことです。これは、CORSの設定ミス[^5]と考えることができ、ブラウザのキャッシュにリソースが存在するかどうかを検知するのに使用できます。
 
 {{< hint info >}} 
-For example, Flask framework [promotes](https://flask-cors.readthedocs.io/en/latest/api.htm) origin reflection as the default behavior.
+例えば、Flask frameworkにおいて、origin refrectionは[デフォルトの動作](https://flask-cors.readthedocs.io/en/latest/api.htm)になっています。
 {{< /hint >}}
 
-If a resource hosted on `server.com` is requested from `target.com` then the origin could be reflected in the response headers as: `Access-Control-Allow-Origin: target.com`. If the resource is cached, this information is stored together with the resource in the browser cache. With that, if `attacker.com` tries to fetch the same resource there are two possible scenarios:
-- The resource is not in cache: the resource could be fetched and stored together with the `Access-Control-Allow-Origin: attacker.com` header.
-- The resource was already in cache: fetch attempt will try to fetch the resource from the cache but it will also generate a CORS error due to the ACAO header value mismatch with the requesting origin (`target.com` origin was expected but `attacker.com` was provided). Here below is provided an example code snippet epxloting this vulnerability to infer the cache status of the victim's browser. 
+もし `server.com` にホストされているリソースが `target.com` からリクエストされた場合、オリジンはレスポンスヘッダに次のように反映されるでしょう。`Access-Control-Allow-Origin: target.com` といった具合です。リソースがキャッシュされている場合、この情報はリソースと一緒にブラウザのキャッシュに保存されます。これにより、もし `attacker.com` が同じリソースを取得しようとした場合、2つの可能性があります。
+
+- リソースがキャッシュにない場合：リソースは `Access-Control-Allow-Origin: attacker.com` ヘッダーとともにフェッチされ、保存される可能性があります。
+- リソースがすでにキャッシュにある：フェッチ試行はキャッシュからリソースをフェッチしようとするが、要求しているオリジンと ACAO ヘッダーの値の不一致によりCORSエラーが起こる。（`target.com`が期待されているが、実際に提供されたのは`attacker.com` 。）以下に、この脆弱性を悪用して被害者のブラウザのキャッシュ状態を推測するコード例を示します。
+
 ```javascript
-// The function simply takes a url and fetches it in CORS mode.
-// If the fetch raises an error, it will be a CORS error due to the 
-// origin mismatch between attacker.com and victim's IP.
+// この関数は、単にURLを受け取り、CORS モードでfetchします。
+// fetchでエラーが発生した場合、attacker.comと犠牲者のIP間の
+// オリジンの不一致によるCORSエラーになります。
 function ifCached(url) {
-    // returns a promise that resolves to true on fetch error 
-    // and to false on success
+    // fetchエラーの場合はtrueを、
+	// 成功の場合はfalseに解決するプロミスを返します。
     return fetch(url, {
         mode: "cors"
     })
@@ -77,20 +78,21 @@ function ifCached(url) {
     .catch(() => true);
 }
 
-// This makes sense only if the attacker already knows that
-// server.com suffers from origin reflection CORS misconfiguration.
+// これは、server.comがorigin reflectionのCORS misconfigurationを
+// 抱えていることを、攻撃者がすでに知っている場合にのみ有効。
 var resource_url = "server.com/reflected_origin_resource.html"
 var verdict = await ifCached(resource_url)
 console.log("Resource was cached: " + verdict)
 ```
 
 {{< hint tip >}}
-The best way to mitigate this is to avoid origin reflection and use the header `Access-Control-Allow-Origin: *` for globally accessible and unauthenticated resources.
+これを軽減する最善の方法は、origin reflectionを排除して、 `Access-Control-Allow-Origin`ヘッダを使用することです。グローバルにアクセス可能で認証不要なリソースには `Access-Control-Allow-Origin: *` を使用します。
 {{< /hint >}}
 
 ## Fetch with AbortController
 
-The below snippet shows how the [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) interface could be combined with *fetch* and *setTimeout* to both detect whether the resource is cached and to evict a specific resource from the browser cache. A nice feature of this technique is that the probing occurs without caching new content in the process.
+以下のスニペットは、[AbortController](https://developer.mozilla.org/en-US/docs/Web/API/AbortController)インターフェースを*fetch*と*setTimeout*と組み合わせることで、リソースがキャッシュされているかどうかを検出し、ブラウザのキャッシュから特定のリソースを退避させる方法を示しています。このテクニックの良いところは、その過程で新しいコンテンツをキャッシュすることなく、プローブが行われることです。
+
 ```javascript
 async function ifCached(url, purge = false) {
     var controller = new AbortController();
@@ -142,26 +144,27 @@ await new Promise(resolve => setTimeout(resolve, 1000));
 await ifCached('https://example.org');
 ```
 
-## Defense
+## 対策
 
-Currently, there are no good defense mechanisms that would allow websites to fully protect against Cache Probing attacks. Nonetheless, a website can mitigate the attack surface by deploying [Cache Protections]({{< ref "cache-protections.md" >}}) such as:
-- [Cache-control headers]({{< ref "cache-protections.md#cache-protection-via-cache-control-headers" >}})  used to prevent the resource from caching.
-- [Random Tokens]({{< ref "cache-protections.md#cache-protection-via-random-tokens" >}}) used to make the URLs unpredictable for attackers.
-- [Vary: Sec-Fetch-Site]({{< ref "cache-protections.md#cache-protection-via-fetch-metadata" >}}) used to segregate the cache by a group of origins.
-- User content that is capable of making networks requests should be on its own eTLD+1 by using a separate domain or the public suffix list (if applicable) to allow for partitioned caches.
+現在、Cache Probing攻撃からウェブサイトを完全に保護できるような優れた防御メカニズムはありません。それでも、以下のような[Cache Protections]({{< ref "cache-protections.md" >}})を導入することで、Webサイトのattack surfaceを縮小することは可能です。
 
-A promising defense against Cache Probing attacks is [partitioning the HTTP cache]({{< ref "../defenses/secure-defaults/partitioned-cache.md" >}}) by the requesting origin. This browser-provided protection prevents an attacker's origin from interfering with cached resources of other origins.
+- [Cache-controlヘッダ]({{< ref "cache-protections.md#cache-protection-via-cache-control-headers" >}})はリソースがキャッシュされるのを防ぐのに利用できます。
+- [Random Tokens]({{< ref "cache-protections.md#cache-protection-via-random-tokens" >}})は攻撃者がURLを推測できないようにするために使用されます。
+- [Vary: Sec-Fetch-Site]({{< ref "cache-protections.md#cache-protection-via-fetch-metadata" >}})はOriginのグループによってキャッシュを分離するために使用されます。
+- ネットワーク要求が可能なユーザーコンテンツは、キャッシュを分割できるように、別ドメインまたは公開サフィックスリスト（適用可能な場合）を使用して、独自のeTLD+1上に配置すべきである。
+
+キャッシュプロービング攻撃に対する有望な防御策は、要求元によってHTTPキャッシュを分割することです。このブラウザが提供する保護機能は、攻撃者のオリジンが他のオリジンのキャッシュされたリソースに干渉するのを防ぎます。
 
 {{< hint info>}}
-As of September 2021, Partitioned Caches is available in most browsers to split the cache by eTLD+1, however applications cannot rely on them.
-The protection is ineffective for requests from subdomains and [window navigations]({{< ref "../attacks/navigations.md#partitioned-http-cache-bypass" >}})
+2021年9月現在、eTLD+1ごとにキャッシュを分割するPartitioned Cachesは、ほとんどのブラウザで利用できますが、アプリケーションはこれに依存できない状況です。
+サブドメインからのリクエストや[window navigation]({{< ref "../attacks/navigations.md#partitioned-http-cache-bypass" >}})には保護が効きません。
 {{< /hint >}}
 
-## Real World Example
+## リアルワールドでの例
 
-An attacker using [Error Events Cache Probing]({{< ref "#cache-probing-with-error-events" >}}) was able to detect whether a user watched a specific YouTube Video by checking if the video thumbnail ended up in browser cache [^3].
+[Error Events Cache Probing]({{< ref "#cache-probing-with-error-events" >}})を利用した攻撃者は、ブラウザのキャッシュにビデオのサムネイルが残っているかどうかを確認することで、ユーザが特定のYouTubeビデオを視聴したかどうかを検出することができました[^3]。
 
-## References
+## 参考文献
 
 [^1]: Abusing HTTP Status Codes to Expose Private Information, [link](https://www.grepular.com/Abusing_HTTP_Status_Codes_to_Expose_Private_Information)
 [^2]: HTTP Cache Cross-Site Leaks, [link](http://sirdarckcat.blogspot.com/2019/03/http-cache-cross-site-leaks.html)
