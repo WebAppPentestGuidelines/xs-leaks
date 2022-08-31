@@ -42,7 +42,8 @@ await getNetworkDuration('https://example.org');
 {{< hint info >}} 他のブラウザと異なり、Firefoxはミリ秒単位で測定値を提供します。 {{< /hint >}}
 
 ## X-Frame-Optionsを検知する
-If displaying a page inside an embed (e.g. because of the `X-Frame-Options` header) it will not be added to the `performance` object in Chrome.
+埋め込み内にページを表示する場合 (たとえば、`X-Frame-Options` ヘッダーのため)、Chrome の `performance` オブジェクトに追加されません。
+
 ```javascript
 async function isFrameBlocked(url) {
     let href = new URL(url).href;

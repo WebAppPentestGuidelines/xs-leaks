@@ -25,7 +25,8 @@ CSSの[`:visited`](https://developer.mozilla.org/en-US/docs/Web/CSS/:visited)セ
 また、レンダリングタイミングを悪用することで、ユーザーとのインタラクションなしに、リンクを別の色に塗り替える方法もあります。[^render-timings-bug]
 複数のリンクを使用して時間差を増加させることで動作するPoCがchromium report上で提供されました。[^render-timings-bug]
 
-{{< hint info >}} [^leak-1] shows an example of this attack using a whack a mole game to trick the user into clicking areas of the page, multiple bugs were reported about this issue: [^bug-1](https://bugs.chromium.org/p/chromium/issues/detail?id=712246), [^bug-2](https://bugs.chromium.org/p/chromium/issues/detail?id=713521), [^bug-3](https://bugzilla.mozilla.org/show_bug.cgi?id=147777){{< /hint >}}
+{{< hint info >}} 
+この攻撃例[^leak-1]は、もぐらたたきゲームを利用してユーザーをだましてページをクリックさせるものです。この問題に関して複数のブラウザにバグが報告されています。: [^bug-1](https://bugs.chromium.org/p/chromium/issues/detail?id=712246), [^bug-2](https://bugs.chromium.org/p/chromium/issues/detail?id=713521), [^bug-3](https://bugzilla.mozilla.org/show_bug.cgi?id=147777){{< /hint >}}
 
 ## Captchaの悪用
 CSSを使えば、埋め込みをコンテキストから外部に取り出せます。 

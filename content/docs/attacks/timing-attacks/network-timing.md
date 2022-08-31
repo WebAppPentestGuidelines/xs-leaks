@@ -108,7 +108,7 @@ measure();
 このPOCでは`setTimeout`を使って、 `while(true)`ループに相当する部分を大まかに作成していることに注意してください。JSのイベントループがブロックされるのを避けるために、このような方法で実装する必要があります。
 {{< /hint >}}
 {{< hint tip >}}
-この手法は、[イベントループをビジー状態にする]]({{< ref "execution-timing.md#busy-event-loop" >}})ことで、ページの実行タイミングを測定することにも応用できる。
+この手法は、[イベントループをビジー状態にする]({{< ref "execution-timing.md#busy-event-loop" >}})ことで、ページの実行タイミングを測定することにも応用できます。
 {{< /hint >}}
 
 ## イベントのアンロード
@@ -171,7 +171,7 @@ iframe.onload = () => {
 
 ## タイムレスタイミング攻撃
 
-この他に、タイミング攻撃を実行するために時間の概念を考慮しないタイプの攻撃もある。このタイムレス攻撃は、2つのHTTPリクエスト(baseline request及びattacked request)を1つのパケットにまとめ、それらをサーバーに同時に到着させることで成立します。サーバーはリクエストを同時に処理し、その実行時間に基づいたレスポンスを可能な限り最速で返します。2つのリクエストのうちどちらかが先に到着することになり、攻撃者はリクエストの到着順序を比較することで時間差を推測することができます。
+この他に、タイミング攻撃を実行するために時間の概念を考慮しないタイプの攻撃もあります。このタイムレス攻撃は、2つのHTTPリクエスト(baseline request及びattacked request)を1つのパケットにまとめ、それらをサーバーに同時に到着させることで成立します。サーバーはリクエストを同時に処理し、その実行時間に基づいたレスポンスを可能な限り最速で返します。2つのリクエストのうちどちらかが先に到着することになり、攻撃者はリクエストの到着順序を比較することで時間差を推測することができます。
 
 この手法の利点は、他の手法では常に存在する、ネットワークのジッターや不確定な遅延から独立していることです。
 
@@ -179,9 +179,10 @@ iframe.onload = () => {
 この攻撃は HTTP の特定のバージョンと共同シナリオに限定されます。それは特定の仮定をし、サーバーの動作に関する要件を持っています。
 
 
-Other types of attacks do not consider the notion of time to perform a timing attack [^3]. Timeless attacks consist of fitting two `HTTP` requests (the baseline and the attacked request) in a single packet, to guarantee they arrive to the server at the same time. The server *will* process the requests concurrently, and return a response based on their execution time as soon as possible. One of the two requests will arrive first, allowing the attacker to infer the time difference by comparing the order in which the requests arrived.
+他のタイプの攻撃は、タイミング攻撃を実行する時間の概念を考慮しません [^3]。
+ タイムレスな攻撃は、2 つの「HTTP」リクエスト (ベースラインと攻撃リクエスト) を 1 つのパケットに合わせて、サーバーに同時に到着することを保証することで構成されます。 サーバーはリクエストを同時に処理し、*できるだけ早く*実行時間に基づいて応答を返します。 2 つのリクエストのうちの 1 つが最初に到着するため、攻撃者はリクエストが到着した順序を比較することで時間差を推測できます。
 
-The advantage of this technique is the independence from network jitter and uncertain delays, something that is always present in the remaining techniques.
+この手法の利点は、ネットワークのジッターや不確実な遅延から独立していることです。これは、残りの手法に常に存在するものです。
 
 {{< hint important >}}
 この攻撃は、HTTPの特定のバージョンと共同シナリオに限定されています。特定の前提や、サーバの動作に関して満たさなくてはならないことがあります。
