@@ -1,5 +1,5 @@
-baseURL = "https://xsleaks.dev/"
-languageCode = "en-us"
+baseURL = "https://webapppentestguidelines.github.io/xs-leaks/"
+languageCode = "ja-jp"
 title = "XS-Leaks Wiki"
 enableGitInfo = true
 theme = "book"
@@ -7,7 +7,7 @@ theme = "book"
 [params]
   # Set source repository location.
   # Used for 'Last Modified' and 'Edit this page' links.
-  BookRepo = 'https://github.com/xsleaks/wiki'
+  BookRepo = 'https://github.com/WebAppPentestGuidelines/xs-leaks/'
 
   # Enable "Edit this page" links for 'doc' page type.
   # Disabled by default. Uncomment to enable. Requires 'BookRepo' param.
