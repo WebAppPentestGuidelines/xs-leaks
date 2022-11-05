@@ -1,64 +1,64 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content><meta name=theme-color content="#FFFFFF"><meta property="og:title" content="Vary: Sec-Fetch-Site"><meta property="og:description" content><meta property="og:type" content="website"><meta property="og:url" content="https://xsleaks.dev/defenses/vary-sec-fetch-site/"><title>Vary: Sec-Fetch-Site | XS-Leaks Wiki</title><link rel=manifest href=/manifest.json><link rel=icon href=/favicon.png type=image/x-icon><link rel=stylesheet href=/book.min.1c9a9009be3c645cbccbe64eb0a90e28621e4118971d9a502db4aaa9bec96cfc.css integrity="sha256-HJqQCb48ZFy8y+ZOsKkOKGIeQRiXHZpQLbSqqb7JbPw="><script defer src=/en.search.min.191ebcb00d5c065f5f76aacb6507e71d1fe649eb2858975535f0380f4e272c40.js integrity="sha256-GR68sA1cBl9fdqrLZQfnHR/mSesoWJdVNfA4D04nLEA="></script>
-<script defer src=/sw.min.6f6f90fcb8eb1c49ec389838e6b801d0de19430b8e516902f8d75c3c8bd98739.js integrity="sha256-b2+Q/LjrHEnsOJg45rgB0N4ZQwuOUWkC+NdcPIvZhzk="></script>
-<link rel=alternate type=application/rss+xml href=https://xsleaks.dev/defenses/vary-sec-fetch-site/index.xml title="XS-Leaks Wiki"></head><body><input type=checkbox class="hidden toggle" id=menu-control>
-<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><nav><h2 class=book-brand><a href=/><span>XS-Leaks Wiki</span></a></h2><div class=book-search><input type=text id=book-search-input placeholder=Search aria-label=Search maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><ul><li class=book-section-flat><span>攻撃手法</span><ul><li><a href=/docs/attacks/xs-search/>XS-Search</a></li><li><a href=/docs/attacks/window-references/>Window References</a></li><li><a href=/docs/attacks/css-tricks/>CSS Tricks</a></li><li><a href=/docs/attacks/error-events/>Error Events</a></li><li><a href=/docs/attacks/frame-counting/>Frame Counting</a></li><li><a href=/docs/attacks/navigations/>Navigations</a></li><li><a href=/docs/attacks/cache-probing/>Cache Probing</a></li><li><a href=/docs/attacks/element-leaks/>Element leaks</a></li><li><a href=/docs/attacks/id-attribute/>ID Attribute</a></li><li><a href=/docs/attacks/postmessage-broadcasts/>postMessage Broadcasts</a></li><li><span>Browser Features</span><ul><li><a href=/docs/attacks/browser-features/corb/>CORB Leaks</a></li><li><a href=/docs/attacks/browser-features/corp/>CORP Leaks</a></li></ul></li><li><span>Timing Attacks</span><ul><li><a href=/docs/attacks/timing-attacks/clocks/>Clocks</a></li><li><a href=/docs/attacks/timing-attacks/network-timing/>Network Timing</a></li><li><a href=/docs/attacks/timing-attacks/performance-api/>Performance API</a></li><li><a href=/docs/attacks/timing-attacks/execution-timing/>Execution Timing</a></li><li><a href=/docs/attacks/timing-attacks/hybrid-timing/>Hybrid Timing</a></li><li><a href=/docs/attacks/timing-attacks/connection-pool/>Connection Pool</a></li></ul></li><li><a href=/docs/attacks/experiments/ class=collapsed>Experiments</a></li><li><a href=/docs/attacks/css-injection/>CSS Injection</a></li><li><a href=/docs/attacks/historical/ class=collapsed>Historical</a></li></ul></li><li class=book-section-flat><a href=/docs/defenses/>対策の仕組み</a><ul><li><a href=/docs/defenses/design-protections/>Application Design</a><ul><li><a href=/docs/defenses/design-protections/cache-protections/>Cache Protections</a></li><li><a href=/docs/defenses/design-protections/subresource-protections/>Subresource Protections</a></li></ul></li><li><a href=/docs/defenses/opt-in/>Opt-In Mechanisms</a><ul><li><a href=/docs/defenses/opt-in/fetch-metadata/>Fetch Metadata</a></li><li><a href=/docs/defenses/opt-in/coop/>Cross-Origin-Opener-Policy</a></li><li><a href=/docs/defenses/opt-in/corp/>Cross-Origin-Resource-Policy</a></li><li><a href=/docs/defenses/opt-in/xfo/>Framing Protections</a></li><li><a href=/docs/defenses/opt-in/same-site-cookies/>SameSite Cookies</a></li><li><a href=/docs/defenses/opt-in/document-policies/>Document Policies</a></li></ul></li><li><a href=/docs/defenses/isolation-policies/>Isolation Policies</a><ul><li><a href=/docs/defenses/isolation-policies/resource-isolation/>Resource Isolation Policy</a></li><li><a href=/docs/defenses/isolation-policies/framing-isolation/>Framing Isolation Policy</a></li><li><a href=/docs/defenses/isolation-policies/navigation-isolation/>Navigation Isolation Policy</a></li><li><a href=/docs/defenses/isolation-policies/strict-isolation/>Strict Isolation Policy</a></li></ul></li><li><a href=/docs/defenses/secure-defaults/>Secure Defaults</a><ul><li><a href=/docs/defenses/secure-defaults/corb/>Cross-Origin Read Blocking</a></li><li><a href=/docs/defenses/secure-defaults/partitioned-cache/>Partitioned HTTP Cache</a></li></ul></li></ul></li><li class=book-section-flat><a href=/docs/contributions/>Contributions</a><ul></ul></li></ul></nav><script>(function(){var e=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/svg/menu.svg class=book-icon alt=Menu></label>
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content><meta name=theme-color content="#FFFFFF"><meta property="og:title" content="Vary: Sec-Fetch-Site"><meta property="og:description" content><meta property="og:type" content="website"><meta property="og:url" content="https://webapppentestguidelines.github.io/xs-leaks/defenses/vary-sec-fetch-site/"><title>Vary: Sec-Fetch-Site | XS-Leaks Wiki</title><link rel=manifest href=/xs-leaks/manifest.json><link rel=icon href=/xs-leaks/favicon.png type=image/x-icon><link rel=stylesheet href=/xs-leaks/book.min.1c9a9009be3c645cbccbe64eb0a90e28621e4118971d9a502db4aaa9bec96cfc.css integrity="sha256-HJqQCb48ZFy8y+ZOsKkOKGIeQRiXHZpQLbSqqb7JbPw="><script defer src=/xs-leaks/en.search.min.3f4d86752e03bee26096d0706d69248797644a7e5ae2f27bd2401b47568d3779.js integrity="sha256-P02GdS4DvuJgltBwbWkkh5dkSn5a4vJ70kAbR1aNN3k="></script>
+<script defer src=/xs-leaks/sw.min.8fe20fa5c13f563a054a6d30584266c3ce999873dcc8c0008902c3c633a2d1b0.js integrity="sha256-j+IPpcE/VjoFSm0wWEJmw86ZmHPcyMAAiQLDxjOi0bA="></script>
+<link rel=alternate type=application/rss+xml href=https://webapppentestguidelines.github.io/xs-leaks/defenses/vary-sec-fetch-site/index.xml title="XS-Leaks Wiki"></head><body><input type=checkbox class="hidden toggle" id=menu-control>
+<input type=checkbox class="hidden toggle" id=toc-control><main class="container flex"><aside class=book-menu><nav><h2 class=book-brand><a href=/xs-leaks><span>XS-Leaks Wiki</span></a></h2><div class=book-search><input type=text id=book-search-input placeholder=Search aria-label=Search maxlength=64 data-hotkeys=s/><div class="book-search-spinner hidden"></div><ul id=book-search-results></ul></div><ul><li class=book-section-flat><span>攻撃手法</span><ul><li><a href=/xs-leaks/docs/attacks/xs-search/>XS-Search</a></li><li><a href=/xs-leaks/docs/attacks/window-references/>Window References</a></li><li><a href=/xs-leaks/docs/attacks/css-tricks/>CSS Tricks</a></li><li><a href=/xs-leaks/docs/attacks/error-events/>Error Events</a></li><li><a href=/xs-leaks/docs/attacks/frame-counting/>Frame Counting</a></li><li><a href=/xs-leaks/docs/attacks/navigations/>Navigations</a></li><li><a href=/xs-leaks/docs/attacks/cache-probing/>Cache Probing</a></li><li><a href=/xs-leaks/docs/attacks/element-leaks/>Element leaks</a></li><li><a href=/xs-leaks/docs/attacks/id-attribute/>ID Attribute</a></li><li><a href=/xs-leaks/docs/attacks/postmessage-broadcasts/>postMessage Broadcasts</a></li><li><span>Browser Features</span><ul><li><a href=/xs-leaks/docs/attacks/browser-features/corb/>CORB Leaks</a></li><li><a href=/xs-leaks/docs/attacks/browser-features/corp/>CORP Leaks</a></li></ul></li><li><span>Timing Attacks</span><ul><li><a href=/xs-leaks/docs/attacks/timing-attacks/clocks/>Clocks</a></li><li><a href=/xs-leaks/docs/attacks/timing-attacks/network-timing/>Network Timing</a></li><li><a href=/xs-leaks/docs/attacks/timing-attacks/performance-api/>Performance API</a></li><li><a href=/xs-leaks/docs/attacks/timing-attacks/execution-timing/>Execution Timing</a></li><li><a href=/xs-leaks/docs/attacks/timing-attacks/hybrid-timing/>Hybrid Timing</a></li><li><a href=/xs-leaks/docs/attacks/timing-attacks/connection-pool/>Connection Pool</a></li></ul></li><li><a href=/xs-leaks/docs/attacks/experiments/ class=collapsed>Experiments</a></li><li><a href=/xs-leaks/docs/attacks/css-injection/>CSS Injection</a></li><li><a href=/xs-leaks/docs/attacks/historical/ class=collapsed>Historical</a></li></ul></li><li class=book-section-flat><a href=/xs-leaks/docs/defenses/>対策の仕組み</a><ul><li><a href=/xs-leaks/docs/defenses/design-protections/>Application Design</a><ul><li><a href=/xs-leaks/docs/defenses/design-protections/cache-protections/>Cache Protections</a></li><li><a href=/xs-leaks/docs/defenses/design-protections/subresource-protections/>Subresource Protections</a></li></ul></li><li><a href=/xs-leaks/docs/defenses/opt-in/>Opt-In Mechanisms</a><ul><li><a href=/xs-leaks/docs/defenses/opt-in/fetch-metadata/>Fetch Metadata</a></li><li><a href=/xs-leaks/docs/defenses/opt-in/coop/>Cross-Origin-Opener-Policy</a></li><li><a href=/xs-leaks/docs/defenses/opt-in/corp/>Cross-Origin-Resource-Policy</a></li><li><a href=/xs-leaks/docs/defenses/opt-in/xfo/>Framing Protections</a></li><li><a href=/xs-leaks/docs/defenses/opt-in/same-site-cookies/>SameSite Cookies</a></li><li><a href=/xs-leaks/docs/defenses/opt-in/document-policies/>Document Policies</a></li></ul></li><li><a href=/xs-leaks/docs/defenses/isolation-policies/>Isolation Policies</a><ul><li><a href=/xs-leaks/docs/defenses/isolation-policies/resource-isolation/>Resource Isolation Policy</a></li><li><a href=/xs-leaks/docs/defenses/isolation-policies/framing-isolation/>Framing Isolation Policy</a></li><li><a href=/xs-leaks/docs/defenses/isolation-policies/navigation-isolation/>Navigation Isolation Policy</a></li><li><a href=/xs-leaks/docs/defenses/isolation-policies/strict-isolation/>Strict Isolation Policy</a></li></ul></li><li><a href=/xs-leaks/docs/defenses/secure-defaults/>Secure Defaults</a><ul><li><a href=/xs-leaks/docs/defenses/secure-defaults/corb/>Cross-Origin Read Blocking</a></li><li><a href=/xs-leaks/docs/defenses/secure-defaults/partitioned-cache/>Partitioned HTTP Cache</a></li></ul></li></ul></li><li class=book-section-flat><a href=/xs-leaks/docs/contributions/>Contributions</a><ul></ul></li></ul></nav><script>(function(){var e=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script></aside><div class=book-page><header class=book-header><div class="flex align-center justify-between"><label for=menu-control><img src=/xs-leaks/svg/menu.svg class=book-icon alt=Menu></label>
 <strong>Vary: Sec-Fetch-Site</strong>
-<label for=toc-control><img src=/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav><ul><li class=book-section-flat><strong>Abuse</strong><ul><li class="flex justify-between"><a href=/abuse/window-references/>Window References</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/browser-feature/>Browser Feature</a>
-<span>2</span></li><li class="flex justify-between"><a href=/abuse/browser-limits/>Browser Limits</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/connection-pool/>Connection Pool</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/content-type/>Content-Type</a>
-<span>3</span></li><li class="flex justify-between"><a href=/abuse/csp-violations/>CSP Violations</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/css/>CSS</a>
-<span>2</span></li><li class="flex justify-between"><a href=/abuse/css-injections/>CSS Injections</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/downloads/>Downloads</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/error-events/>Error Events</a>
-<span>3</span></li><li class="flex justify-between"><a href=/abuse/event-loop/>Event Loop</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/focus/>focus</a>
-<span>2</span></li><li class="flex justify-between"><a href=/abuse/history/>History</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/iframes/>iframes</a>
-<span>9</span></li><li class="flex justify-between"><a href=/abuse/nosniff/>nosniff</a>
-<span>2</span></li><li class="flex justify-between"><a href=/abuse/onblur/>onblur</a>
-<span>2</span></li><li class="flex justify-between"><a href=/abuse/postmessage/>postMessage</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/redirects/>Redirects</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/regex-injections/>Regex Injections</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/service-workers/>Service Workers</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/site-isolation/>Site Isolation</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/status-code/>Status Code</a>
-<span>2</span></li><li class="flex justify-between"><a href=/abuse/typemustmatch/>typeMustMatch</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/window.open/>window.open</a>
-<span>2</span></li><li class="flex justify-between"><a href=/abuse/window.performance/>window.performance</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/window.stop/>window.stop</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/abortcontroller/>AbortController</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/cache/>Cache</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/htmlelement/>HTMLElement</a>
-<span>1</span></li></ul></li><li class=book-section-flat><strong>Category</strong><ul><li class="flex justify-between"><a href=/category/defense/>Defense</a>
-<span>14</span></li><li class="flex justify-between"><a href=/category/attack/>Attack</a>
-<span>18</span></li><li class="flex justify-between"><a href=/category/attack-principle/>Attack Principle</a>
-<span>1</span></li><li class="flex justify-between"><a href=/category/experiments/>Experiments</a>
-<span>2</span></li><li class="flex justify-between"><a href=/category/historical/>Historical</a>
-<span>2</span></li><li class="flex justify-between"><a href=/category/instrument/>Instrument</a>
-<span>1</span></li></ul></li><li class=book-section-flat><strong>Defenses</strong><ul><li class="flex justify-between"><a href=/defenses/coop/>COOP</a>
-<span>6</span></li><li class="flex justify-between"><a href=/defenses/fetch-metadata/>Fetch Metadata</a>
-<span>12</span></li><li class="flex justify-between"><a href=/defenses/samesite-cookies/>SameSite Cookies</a>
-<span>15</span></li><li class="flex justify-between"><a href=/defenses/application-fix/>Application Fix</a>
-<span>1</span></li><li class="flex justify-between"><a href=/defenses/browser-fix/>Browser Fix</a>
-<span>1</span></li><li class="flex justify-between"><a href=/defenses/corb/>CORB</a>
-<span>1</span></li><li class="flex justify-between"><a href=/defenses/deprecation/>Deprecation</a>
-<span>1</span></li><li class="flex justify-between"><a href=/defenses/document-policies/>Document Policies</a>
-<span>2</span></li><li class="flex justify-between"><a href=/defenses/framing-protections/>Framing Protections</a>
-<span>6</span></li><li class="flex justify-between"><a href=/defenses/subresource-protections/>Subresource Protections</a>
-<span>1</span></li><li class="flex justify-between"><a href=/defenses/vary-sec-fetch-site/>Vary: Sec-Fetch-Site</a>
-<span>1</span></li></ul></li></ul></nav></aside></header><article class="markdown book-post"><h2><a href=/docs/attacks/cache-probing/>Cache Probing</a></h2><div>Abuse
-<a href=/abuse/window.open/>window.open</a>,
-<a href=/abuse/error-events/>Error Events</a>,
-<a href=/abuse/cache/>Cache</a>,
-<a href=/abuse/iframes/>iframes</a>,
-<a href=/abuse/abortcontroller/>AbortController</a></div><div>Category
-<a href=/category/attack/>Attack</a></div><div>Defenses
-<a href=/defenses/samesite-cookies/>SameSite Cookies</a>,
-<a href=/defenses/vary-sec-fetch-site/>Vary: Sec-Fetch-Site</a>,
-<a href=/defenses/subresource-protections/>Subresource Protections</a></div><p>Cache Probingは、あるリソースがブラウザによってキャッシュされているかどうかを検知する手法です。そのコンセプトは、初期のWeb1から知られており、当初はタイミングの差異を検知することに基づいていました。
+<label for=toc-control><img src=/xs-leaks/svg/toc.svg class=book-icon alt="Table of Contents"></label></div><aside class="hidden clearfix"><nav><ul><li class=book-section-flat><strong>Abuse</strong><ul><li class="flex justify-between"><a href=/xs-leaks/abuse/window-references/>Window References</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/browser-feature/>Browser Feature</a>
+<span>2</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/browser-limits/>Browser Limits</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/connection-pool/>Connection Pool</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/content-type/>Content-Type</a>
+<span>3</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/csp-violations/>CSP Violations</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/css/>CSS</a>
+<span>2</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/css-injections/>CSS Injections</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/downloads/>Downloads</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/error-events/>Error Events</a>
+<span>3</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/event-loop/>Event Loop</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/focus/>focus</a>
+<span>2</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/history/>History</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/iframes/>iframes</a>
+<span>9</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/nosniff/>nosniff</a>
+<span>2</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/onblur/>onblur</a>
+<span>2</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/postmessage/>postMessage</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/redirects/>Redirects</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/regex-injections/>Regex Injections</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/service-workers/>Service Workers</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/site-isolation/>Site Isolation</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/status-code/>Status Code</a>
+<span>2</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/typemustmatch/>typeMustMatch</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/window.open/>window.open</a>
+<span>2</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/window.performance/>window.performance</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/window.stop/>window.stop</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/abortcontroller/>AbortController</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/cache/>Cache</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/htmlelement/>HTMLElement</a>
+<span>1</span></li></ul></li><li class=book-section-flat><strong>Category</strong><ul><li class="flex justify-between"><a href=/xs-leaks/category/defense/>Defense</a>
+<span>14</span></li><li class="flex justify-between"><a href=/xs-leaks/category/attack/>Attack</a>
+<span>18</span></li><li class="flex justify-between"><a href=/xs-leaks/category/attack-principle/>Attack Principle</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/category/experiments/>Experiments</a>
+<span>2</span></li><li class="flex justify-between"><a href=/xs-leaks/category/historical/>Historical</a>
+<span>2</span></li><li class="flex justify-between"><a href=/xs-leaks/category/instrument/>Instrument</a>
+<span>1</span></li></ul></li><li class=book-section-flat><strong>Defenses</strong><ul><li class="flex justify-between"><a href=/xs-leaks/defenses/coop/>COOP</a>
+<span>6</span></li><li class="flex justify-between"><a href=/xs-leaks/defenses/fetch-metadata/>Fetch Metadata</a>
+<span>12</span></li><li class="flex justify-between"><a href=/xs-leaks/defenses/samesite-cookies/>SameSite Cookies</a>
+<span>15</span></li><li class="flex justify-between"><a href=/xs-leaks/defenses/application-fix/>Application Fix</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/defenses/browser-fix/>Browser Fix</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/defenses/corb/>CORB</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/defenses/deprecation/>Deprecation</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/defenses/document-policies/>Document Policies</a>
+<span>2</span></li><li class="flex justify-between"><a href=/xs-leaks/defenses/framing-protections/>Framing Protections</a>
+<span>6</span></li><li class="flex justify-between"><a href=/xs-leaks/defenses/subresource-protections/>Subresource Protections</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/defenses/vary-sec-fetch-site/>Vary: Sec-Fetch-Site</a>
+<span>1</span></li></ul></li></ul></nav></aside></header><article class="markdown book-post"><h2><a href=/xs-leaks/docs/attacks/cache-probing/>Cache Probing</a></h2><div>Abuse
+<a href=/xs-leaks/abuse/window.open/>window.open</a>,
+<a href=/xs-leaks/abuse/error-events/>Error Events</a>,
+<a href=/xs-leaks/abuse/cache/>Cache</a>,
+<a href=/xs-leaks/abuse/iframes/>iframes</a>,
+<a href=/xs-leaks/abuse/abortcontroller/>AbortController</a></div><div>Category
+<a href=/xs-leaks/category/attack/>Attack</a></div><div>Defenses
+<a href=/xs-leaks/defenses/samesite-cookies/>SameSite Cookies</a>,
+<a href=/xs-leaks/defenses/vary-sec-fetch-site/>Vary: Sec-Fetch-Site</a>,
+<a href=/xs-leaks/defenses/subresource-protections/>Subresource Protections</a></div><p>Cache Probingは、あるリソースがブラウザによってキャッシュされているかどうかを検知する手法です。そのコンセプトは、初期のWeb1から知られており、当初はタイミングの差異を検知することに基づいていました。
 ユーザがWebサイトに訪れると、画像、スクリプト、そしてHTMLコンテンツなどの様々なリソースが取得され、それらは(特定の条件下で)ブラウザによってキャッシュされます。この最適化により、ブラウザはこれらのリソースを再度要求することなくディスクから提供するため、その後のナビゲーションが高速化されます。もし攻撃者がどのリソースがキャッシュされているかを検知できれば、この情報を基に、ユーザが特定のページにアクセスしたことがあるかどうかをリークできます。
 Cache Probingのバリエーションとして、Error Eventsを悪用することにより、より正確でインパクトのある攻撃を実行することができます。
 攻撃の原理 # 攻撃者は、あるユーザーがあるSNSを訪問したかどうかを知りたいと考えています。
@@ -69,50 +69,50 @@ Origin ReflectionによるCORS error # Origin Reflectionは、グローバルに
 info
 例えば、Flask frameworkにおいて、origin refrectionはデフォルトの動作になっています。 もし server.com にホストされているリソースが target.com からリクエストされた場合、オリジンはレスポンスヘッダに次のように反映されるでしょう。Access-Control-Allow-Origin: target.com といった具合です。リソースがキャッシュされている場合、この情報はリソースと一緒にブラウザのキャッシュに保存されます。これにより、もし attacker.com が同じリソースを取得しようとした場合、2つの可能性があります。
 リソースがキャッシュにない場合：リソースは Access-Control-Allow-Origin: attacker.com ヘッダーとともにフェッチされ、保存される可能性があります。 リソースがすでにキャッシュにある：フェッチ試行はキャッシュからリソースをフェッチしようとするが、要求しているオリジンと ACAO ヘッダーの値の不一致によりCORSエラーが起こる。（target.comが期待されているが、実際に提供されたのはattacker.com 。）以下に、この脆弱性を悪用して被害者のブラウザのキャッシュ状態を推測するコード例を示します。 // この関数は、単にURLを受け取り、CORS モードでfetchします。 // fetchでエラーが発生した場合、attacker.
-<a href=/docs/attacks/cache-probing/>...</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"></div></footer><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><nav><ul><li class=book-section-flat><strong>Abuse</strong><ul><li class="flex justify-between"><a href=/abuse/window-references/>Window References</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/browser-feature/>Browser Feature</a>
-<span>2</span></li><li class="flex justify-between"><a href=/abuse/browser-limits/>Browser Limits</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/connection-pool/>Connection Pool</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/content-type/>Content-Type</a>
-<span>3</span></li><li class="flex justify-between"><a href=/abuse/csp-violations/>CSP Violations</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/css/>CSS</a>
-<span>2</span></li><li class="flex justify-between"><a href=/abuse/css-injections/>CSS Injections</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/downloads/>Downloads</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/error-events/>Error Events</a>
-<span>3</span></li><li class="flex justify-between"><a href=/abuse/event-loop/>Event Loop</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/focus/>focus</a>
-<span>2</span></li><li class="flex justify-between"><a href=/abuse/history/>History</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/iframes/>iframes</a>
-<span>9</span></li><li class="flex justify-between"><a href=/abuse/nosniff/>nosniff</a>
-<span>2</span></li><li class="flex justify-between"><a href=/abuse/onblur/>onblur</a>
-<span>2</span></li><li class="flex justify-between"><a href=/abuse/postmessage/>postMessage</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/redirects/>Redirects</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/regex-injections/>Regex Injections</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/service-workers/>Service Workers</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/site-isolation/>Site Isolation</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/status-code/>Status Code</a>
-<span>2</span></li><li class="flex justify-between"><a href=/abuse/typemustmatch/>typeMustMatch</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/window.open/>window.open</a>
-<span>2</span></li><li class="flex justify-between"><a href=/abuse/window.performance/>window.performance</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/window.stop/>window.stop</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/abortcontroller/>AbortController</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/cache/>Cache</a>
-<span>1</span></li><li class="flex justify-between"><a href=/abuse/htmlelement/>HTMLElement</a>
-<span>1</span></li></ul></li><li class=book-section-flat><strong>Category</strong><ul><li class="flex justify-between"><a href=/category/defense/>Defense</a>
-<span>14</span></li><li class="flex justify-between"><a href=/category/attack/>Attack</a>
-<span>18</span></li><li class="flex justify-between"><a href=/category/attack-principle/>Attack Principle</a>
-<span>1</span></li><li class="flex justify-between"><a href=/category/experiments/>Experiments</a>
-<span>2</span></li><li class="flex justify-between"><a href=/category/historical/>Historical</a>
-<span>2</span></li><li class="flex justify-between"><a href=/category/instrument/>Instrument</a>
-<span>1</span></li></ul></li><li class=book-section-flat><strong>Defenses</strong><ul><li class="flex justify-between"><a href=/defenses/coop/>COOP</a>
-<span>6</span></li><li class="flex justify-between"><a href=/defenses/fetch-metadata/>Fetch Metadata</a>
-<span>12</span></li><li class="flex justify-between"><a href=/defenses/samesite-cookies/>SameSite Cookies</a>
-<span>15</span></li><li class="flex justify-between"><a href=/defenses/application-fix/>Application Fix</a>
-<span>1</span></li><li class="flex justify-between"><a href=/defenses/browser-fix/>Browser Fix</a>
-<span>1</span></li><li class="flex justify-between"><a href=/defenses/corb/>CORB</a>
-<span>1</span></li><li class="flex justify-between"><a href=/defenses/deprecation/>Deprecation</a>
-<span>1</span></li><li class="flex justify-between"><a href=/defenses/document-policies/>Document Policies</a>
-<span>2</span></li><li class="flex justify-between"><a href=/defenses/framing-protections/>Framing Protections</a>
-<span>6</span></li><li class="flex justify-between"><a href=/defenses/subresource-protections/>Subresource Protections</a>
-<span>1</span></li><li class="flex justify-between"><a href=/defenses/vary-sec-fetch-site/>Vary: Sec-Fetch-Site</a>
+<a href=/xs-leaks/docs/attacks/cache-probing/>...</a></p></article><footer class=book-footer><div class="flex flex-wrap justify-between"></div></footer><label for=menu-control class="hidden book-menu-overlay"></label></div><aside class=book-toc><nav><ul><li class=book-section-flat><strong>Abuse</strong><ul><li class="flex justify-between"><a href=/xs-leaks/abuse/window-references/>Window References</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/browser-feature/>Browser Feature</a>
+<span>2</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/browser-limits/>Browser Limits</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/connection-pool/>Connection Pool</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/content-type/>Content-Type</a>
+<span>3</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/csp-violations/>CSP Violations</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/css/>CSS</a>
+<span>2</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/css-injections/>CSS Injections</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/downloads/>Downloads</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/error-events/>Error Events</a>
+<span>3</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/event-loop/>Event Loop</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/focus/>focus</a>
+<span>2</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/history/>History</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/iframes/>iframes</a>
+<span>9</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/nosniff/>nosniff</a>
+<span>2</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/onblur/>onblur</a>
+<span>2</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/postmessage/>postMessage</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/redirects/>Redirects</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/regex-injections/>Regex Injections</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/service-workers/>Service Workers</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/site-isolation/>Site Isolation</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/status-code/>Status Code</a>
+<span>2</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/typemustmatch/>typeMustMatch</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/window.open/>window.open</a>
+<span>2</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/window.performance/>window.performance</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/window.stop/>window.stop</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/abortcontroller/>AbortController</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/cache/>Cache</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/abuse/htmlelement/>HTMLElement</a>
+<span>1</span></li></ul></li><li class=book-section-flat><strong>Category</strong><ul><li class="flex justify-between"><a href=/xs-leaks/category/defense/>Defense</a>
+<span>14</span></li><li class="flex justify-between"><a href=/xs-leaks/category/attack/>Attack</a>
+<span>18</span></li><li class="flex justify-between"><a href=/xs-leaks/category/attack-principle/>Attack Principle</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/category/experiments/>Experiments</a>
+<span>2</span></li><li class="flex justify-between"><a href=/xs-leaks/category/historical/>Historical</a>
+<span>2</span></li><li class="flex justify-between"><a href=/xs-leaks/category/instrument/>Instrument</a>
+<span>1</span></li></ul></li><li class=book-section-flat><strong>Defenses</strong><ul><li class="flex justify-between"><a href=/xs-leaks/defenses/coop/>COOP</a>
+<span>6</span></li><li class="flex justify-between"><a href=/xs-leaks/defenses/fetch-metadata/>Fetch Metadata</a>
+<span>12</span></li><li class="flex justify-between"><a href=/xs-leaks/defenses/samesite-cookies/>SameSite Cookies</a>
+<span>15</span></li><li class="flex justify-between"><a href=/xs-leaks/defenses/application-fix/>Application Fix</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/defenses/browser-fix/>Browser Fix</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/defenses/corb/>CORB</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/defenses/deprecation/>Deprecation</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/defenses/document-policies/>Document Policies</a>
+<span>2</span></li><li class="flex justify-between"><a href=/xs-leaks/defenses/framing-protections/>Framing Protections</a>
+<span>6</span></li><li class="flex justify-between"><a href=/xs-leaks/defenses/subresource-protections/>Subresource Protections</a>
+<span>1</span></li><li class="flex justify-between"><a href=/xs-leaks/defenses/vary-sec-fetch-site/>Vary: Sec-Fetch-Site</a>
 <span>1</span></li></ul></li></ul></nav></aside></main></body></html>

@@ -1,0 +1,1 @@
+navigator.serviceWorker&&navigator.serviceWorker.register("/xs-leaks/sw.js",{scope:"/"})
